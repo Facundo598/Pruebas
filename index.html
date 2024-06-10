@@ -4,12 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Página de GitHub</title>
+    <style>/*Contenedor de dos botones a la derecha de la pagina*/
+        .button-container {display: flex;justify-content: flex-end;margin-top: 20px;}
+        .custom-button {justify-content: end;padding: 10px 10px;line-height: 20px;
+                        text-align: start;margin-left: 10px; /* Espacio entre botones */}
+      </style>
 </head>
 <body>
-    <h1>Bienvenido a mi página de GitHub</h1>
-    <p>Esta es una página de ejemplo.</p>
-    <img src="https://visitor-badge.glitch.me/badge?page_id=tu-usuario.tu-repositorio" alt="Contador de visitas">
-    <!-- O usando Hits -->
-    <!-- <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https://tu-usuario.github.io/tu-repositorio/&title=Contador%20de%20Visitas" alt="Contador de visitas"> -->
+    <div class="button-container">
+        <button class="custom-button" id="Button1"> //Fecha
+            <strong>Texto</strong></button>
+        <button class="custom-button" id="Button2"> //Contador
+            <strong>
+                <!-- hitwebcounter Code START (Codigo que proporcina la pagina web para contador) -->
+                <a href="https://www.hitwebcounter.com" target="_blank">
+                    <img src="https://hitwebcounter.com/counter/counter.php?page=14000561&style=0011&nbdigits=3&type=page&initCount=0" title="Counter Widget" alt="Visit counter For Websites" border="0" />
+                </a>
+                <!-- hitwebcounter Code END (Codigo que proporcina la pagina web para contador)-->
+            </strong></button>
+    </div>
+    
+    <script>
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        }
+        const currentDate = formatDate(new Date());
+        /*En Buttton1 se pone los datos de dd/mm/aaa hh:mm*/
+        document.getElementById('Button1').querySelector('strong').textContent = currentDate;
+    </script>
+
+    <!-- hitwebcounter Code START (Codigo que proporcina la pagina web para contador) -->
+    <a href="https://www.hitwebcounter.com" target="_blank">
+        <img src="https://hitwebcounter.com/counter/counter.php?page=14000561&style=0011&nbdigits=3&type=page&initCount=0" title="Counter Widget" alt="Visit counter For Websites" border="0" />
+    </a>
+    <!-- hitwebcounter Code END (Codigo que proporcina la pagina web para contador)-->
+    
 </body>
 </html>
