@@ -1,0 +1,63 @@
+// Calculadora de 3 valores con slider 
+
+<body>
+    <div class="container" style="text-align: center;">
+        <div style="display: inline-block;">
+            <p style="text-align: center;">P0 = <span id="P0Value">91</span></p>
+            <input type="range" id="sliderP0" min="91" max="95" step="0.1" value="91" oninput="updateValue('sliderP0')">
+        </div>
+      
+        <span>&nbsp;&nbsp;</span>
+      
+        <div style="display: inline-block;">
+            <p style="text-align: center;">T2 = <span id="T2Value">1</span></p>
+            <input type="range" id="sliderT2" min="5" max="30" value="1" oninput="updateValue('sliderT2')">
+        </div>
+      
+        <span>&nbsp;&nbsp;</span>
+      
+        <div style="display: inline-block;">
+            <p style="text-align: center;">PS3 = <span id="PS3Value">1</span></p>
+            <input type="range" id="sliderPS3" min="3344" max="3826" value="1" oninput="updateValue('sliderPS3')">
+        </div>
+
+        <h3 style="text-align: center;">Potencia Estimada [MW] = <span id="sumValue">11</span></h3> 
+
+        <script>
+            function updateValue(sliderId) {
+                // Obtiene el valor del slider específico
+                let slider = document.getElementById(sliderId);
+                let sliderValue = parseFloat(slider.value);
+
+                // Actualiza el valor del slider específico en su respectivo span
+                if (sliderId === 'sliderT2')
+                	{document.getElementById('T2Value').textContent = sliderValue;} 
+              	else if (sliderId === 'sliderP0') 
+                	{document.getElementById('P0Value').textContent = sliderValue.toFixed(1); // Mostrar decimal} 
+                else if (sliderId === 'sliderPS3') 
+                	{document.getElementById('PS3Value').textContent = sliderValue;}
+
+                // Obtiene los valores actuales de los sliders
+                let T2Value = parseInt(document.getElementById('sliderT2').value);
+                let P0Value = parseFloat(document.getElementById('sliderP0').value);
+                let PS3Value = parseInt(document.getElementById('sliderPS3').value);
+                
+                // Convertir PS3, P0 y T2
+                let PS3_psi = PS3Value * 0.145038;
+                let P0_psi = P0Value * 0.145038; 
+                let T2_F = T2Value * 9/5 + 32;
+              
+                // Calcular Potencia Estimada
+                let sumValue = ((0.221 * (PS3_psi / (P0_psi / 14.696))) - 0.008 * T2_F - 26.417) * (P0_psi / 14.696) + 1.4;
+                sumValue = sumValue.toFixed(3);
+              
+                // Muestra la suma en el elemento con id 'sumValue'
+                document.getElementById('sumValue').textContent = sumValue;
+            }
+
+            // Inicializa los valores al cargar la página
+            window.onload = function() 
+              {updateValue('sliderT2');updateValue('sliderP0');updateValue('sliderPS3');}
+        </script>
+    </div>
+</body>
