@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulario de Cálculo</title>
+</head>
+<body>
+    <form>
+        <label for="P0">P0 [KPa] =</label>
+        <input type="number" id="P0" oninput="calculo()" style="width: 80px;">
+        <span>&nbsp;&nbsp;</span>
+        <label for="T2SEL">T2SEL [°C] =</label>
+        <input type="number" id="T2SEL" oninput="calculo()" style="width: 80px;">
+        <span>&nbsp;&nbsp;</span>
+        <label for="PS3SEL">PS3SEL [KPa] =</label>
+        <input type="number" id="PS3SEL" oninput="calculo()" style="width: 80px;">
+        <br><br>
+        <label for="Mwest">POTENCIA ESTIMADA [MW] =</label>
+        <input type="number" id="Mwest" readonly style="width: 80px;">
+    </form>
+
+    <script>
+        function calculo() {
+            // Obtener los valores de los inputs
+            let P0 = parseFloat(document.getElementById('P0').value) || 0;
+            let T2SEL = parseFloat(document.getElementById('T2SEL').value) || 0;
+            let PS3SEL = parseFloat(document.getElementById('PS3SEL').value) || 0;
+
+            // Convertir PS3, P0 y T2
+            let PS3_psi = PS3SEL * 0.145038;
+            let P0_psi = P0 * 0.145038;
+            let T2_F = T2SEL * 9/5 + 32;
+
+            // Calcular Potencia Estimada (esto es solo un ejemplo, reemplaza con tu fórmula real)
+            let potenciaEstimada = ((0.221 * (PS3_psi / (P0_psi / 14.696))) - 0.008 * T2_F - 26.417) * (P0_psi / 14.696) + 1.4;
+            potenciaEstimada = potenciaEstimada.toFixed(3);
+
+            // Actualizar el campo readonly
+            document.getElementById('Mwest').value = potenciaEstimada;
+        }
+    </script>
+</body>
+</html>
