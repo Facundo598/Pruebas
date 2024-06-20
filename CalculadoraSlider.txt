@@ -33,7 +33,7 @@
                 if (sliderId === 'sliderT2')
                 	{document.getElementById('T2Value').textContent = sliderValue;} 
               	else if (sliderId === 'sliderP0') 
-                	{document.getElementById('P0Value').textContent = sliderValue.toFixed(1); // Mostrar decimal} 
+                	{document.getElementById('P0Value').textContent = sliderValue.toFixed(1);} // Mostrar decimal 
                 else if (sliderId === 'sliderPS3') 
                 	{document.getElementById('PS3Value').textContent = sliderValue;}
 
