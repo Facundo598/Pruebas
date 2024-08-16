@@ -46,6 +46,29 @@
     </button>
 
 
+
+
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso a Ruta de Red</title>
+    <script>
+        function openNetworkFolder() {
+            // La función 'start' no es estándar en JavaScript para navegadores
+            // Este código no funcionará en la mayoría de los navegadores
+            try {
+                var folderPath = "\\\\192.168.94.7\\publico\\";
+                // Intentar abrir la ruta de red (esto no funcionará en navegadores modernos)
+                window.location.href = "file://" + folderPath;
+                // Alternativa: alert para mostrar la ruta
+                alert("Intentando abrir: " + folderPath);
+            } catch (e) {
+                alert("No se pudo abrir la ruta de red.");
+            }
+        }
+    </script>
+
     
 </body>
 </html>
