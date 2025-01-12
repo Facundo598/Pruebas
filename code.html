@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codigo</title>
+    <style>
+        .code-container { background: #2d2d2d; color: #f8f8f2; padding: 10px; border-radius: 5px; }
+        .copy-button { background: #6272a4; color: #fff; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div class="code-container">
+        <button class="copy-button" onclick="copyCode()">Copiar</button>
+        <pre><code>void setup() { 
+    pinMode(12, OUTPUT); 
+    tone(12, 6000); 
+}
+
+void loop() {
+    // Nada en el loop
+}</code></pre>
+    </div>
+
+    <script>
+        function copyCode() {
+            const code = document.querySelector('.code-container pre code').innerText;
+            navigator.clipboard.writeText(code);
+        }
+    </script>
+</body>
+</html>
