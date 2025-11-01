@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Clima en Departamento General Güemes</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body { 
+    font-family: Arial, sans-serif; 
+    text-align: center; 
+    background: #f0f4f7; 
+    color: #333; 
+  }
+  h2 { margin-top: 20px; }
+  .weather-current {
+    margin: 20px auto;
+    font-size: 2.2em;
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .chart-container {
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    height: 500px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 20px;
+  }
+</style>
+</head>
+<body>
+<h2>Clima actual en Departamento General Güemes (Salta)</h2>
+<div class="weather-current" id="temp">Cargando...</div>
+
+<h2>Pronóstico Semanal</h2>
+<div class="chart-container">
+  <canvas id="chart"></canvas>
+</div>
+
+<script>
+// Coordenadas General Güemes
+const lat = -24.15;
+const lon = -64.88;
+
+// CLIMA ACTUAL (temperatura + humedad)
+const urlCurrent = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m&temperature_unit=celsius&windspeed_unit=kmh`;
+
+fetch(urlCurrent)
+  .then(res => res.json())
+  .then(data => {
+    const temp = data.current_weather.temperature;
+    const now = new Date();
+    const nowHour = now.toISOString().slice(0,13); // YYYY-MM-DDTHH
+
+    let humidity = null;
+    for(let i=0; i<data.hourly.time.length; i++){
+      if(data.hourly.time[i].slice(0,13) === nowHour){
+        humidity = data.hourly.relativehumidity_2m[i];
+        break;
+      }
+    }
+
+    document.getElementById("temp").innerHTML = `🌡️ ${temp}°C, 💧 ${humidity}%`;
+  })
+  .catch(() => {
+    document.getElementById("temp").innerHTML = "No se pudo obtener el clima.";
+  });
+
+// PRONÓSTICO SEMANAL
+const urlForecast = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min&hourly=relativehumidity_2m&timezone=America/Argentina/Salta&temperature_unit=celsius`;
+
+fetch(urlForecast)
+  .then(res => res.json())
+  .then(data => {
+    // Calcular humedad diaria
+    const humidityByDay = {};
+    data.hourly.time.forEach((t,i) => {
+      const day = t.split("T")[0];
+      if(!humidityByDay[day]) humidityByDay[day] = [];
+      humidityByDay[day].push(data.hourly.relativehumidity_2m[i]);
+    });
+
+    // Preparar arrays
+    const labels = data.daily.time.map(d => {
+      const date = new Date(d);
+      return date.toLocaleDateString('es-AR', { weekday: 'short' });
+    });
+    const tempMax = data.daily.temperature_2m_max;
+    const tempMin = data.daily.temperature_2m_min;
+    const humMax = data.daily.time.map(d => Math.max(...humidityByDay[d]));
+    const humMin = data.daily.time.map(d => Math.min(...humidityByDay[d]));
+
+    const ctx = document.getElementById('chart').getContext('2d');
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Temp Máx (°C)',
+            data: tempMax,
+            borderColor: 'rgba(255,99,132,1)',
+            backgroundColor: 'rgba(255,99,132,0.2)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yTemp'
+          },
+          {
+            label: 'Temp Mín (°C)',
+            data: tempMin,
+            borderColor: 'rgba(255,159,64,1)',
+            backgroundColor: 'rgba(255,159,64,0.2)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yTemp'
+          },
+          {
+            label: 'Humedad Máx (%)',
+            data: humMax,
+            borderColor: 'rgba(54,162,235,1)',
+            backgroundColor: 'rgba(54,162,235,0.1)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yHum'
+          },
+          {
+            label: 'Humedad Mín (%)',
+            data: humMin,
+            borderColor: 'rgba(75,192,192,1)',
+            backgroundColor: 'rgba(75,192,192,0.1)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'yHum'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { font: { size: 14 } } },
+          title: { display: true, text: 'Pronóstico Semanal', font: { size: 18 } }
+        },
+        scales: {
+          yTemp: {
+            type: 'linear',
+            position: 'left',
+            title: { display: true, text: 'Temperatura (°C)' },
+            beginAtZero: false
+          },
+          yHum: {
+            type: 'linear',
+            position: 'right',
+            title: { display: true, text: 'Humedad (%)' },
+            beginAtZero: true,
+            min: 0,
+            max: 100,
+            grid: { drawOnChartArea: false }
+          }
+        }
+      }
+    });
+
+  })
+  .catch(err => console.error(err));
+</script>
+</body>
+</html>
