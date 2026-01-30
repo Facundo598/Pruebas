@@ -1,31 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Clima en Salta</title>
+  <meta charset="UTF-8">
+  <title>Demo Fullscreen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    button {
+      font-size: 1.2rem;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      background: #00e0ff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00bcd4;
+    }
+  </style>
 </head>
 <body>
-<h2>Clima actual en Salta</h2>
 
-<a class="weatherwidget-io" 
-   href="https://forecast7.com/es/n24d79n65d41/salta/" 
-   data-label_1="SALTA" 
-   data-label_2="CLIMA ACTUAL" 
-   data-theme="original">
-   SALTA CLIMA
-</a>
+  <div class="container">
+    <h1>Modo Pantalla Completa</h1>
+    <p>Simulación tipo publicidad / app web</p>
+    <button onclick="goFullscreen()">Entrar</button>
+  </div>
 
-<script>
-!function(d,s,id){
-  var js,fjs=d.getElementsByTagName(s)[0];
-  if(!d.getElementById(id)){
-    js=d.createElement(s);
-    js.id=id;
-    js.src='https://weatherwidget.io/js/widget.min.js';
-    fjs.parentNode.insertBefore(js,fjs);
-  }
-}(document,'script','weatherwidget-io-js');
-</script>
+  <script>
+    function goFullscreen() {
+      const elem = document.documentElement;
+
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen(); // Safari
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen(); // Edge viejo
+      }
+    }
+  </script>
 
 </body>
 </html>
