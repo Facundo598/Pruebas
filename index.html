@@ -1,111 +1,185 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Buscador de Equipos</title>
+  <meta charset="UTF-8">
+  <title>Buscar Equipos 380V</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-image: url("Sala.jpg");
-  background-size: cover;
-  background-position: center;
-  min-height: 100vh;
-}
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
 
-.overlay {
-  background: rgba(0,0,0,0.45);
-  min-height: 100vh;
-  padding: 30px;
-}
+    body {
+      background-image: url("Sala.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-h1 {
-  color: yellow;
-  text-shadow: 1px 1px 3px black;
-}
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
 
-input {
-  font-size: 1.4rem;
-  padding: 14px 18px;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 6px;
-  border: none;
-  margin-bottom: 20px;
-}
+    .content {
+      position: relative;
+      z-index: 2;
+      color: white;
+      text-align: center;
+      width: 90%;
+      max-width: 900px;
+    }
 
-.resultados {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 15px;
-}
+    h1 {
+      color: #5DDE82;
+    }
 
-.card {
-  background: white;
-  border-radius: 8px;
-  padding: 15px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-  transition: transform 0.15s ease;
-}
+    select, input {
+      font-size: 1.4rem;
+      padding: 11px 15px;
+      border-radius: 6px;
+      border: none;
+      margin-bottom: 15px;
+      width: 100%;
+      max-width: 420px;
+    }
 
-.card:hover {
-  transform: scale(1.03);
-}
+    button {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      background: #00e0ff;
+      cursor: pointer;
+    }
 
-.card .equipo {
-  font-weight: bold;
-  font-size: 1.2rem;
-  margin-bottom: 6px;
-}
+    button:hover {
+      background: #00bcd4;
+    }
 
-.card .desc {
-  font-size: 0.95rem;
-  color: #333;
-}
-</style>
+    /* === RESULTADOS === */
+    .resultados {
+      margin-top: 25px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      color: #000;
+      border-radius: 8px;
+      padding: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      transition: transform 0.15s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .equipo {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+    }
+
+    .desc {
+      font-size: 0.95rem;
+      color: #333;
+    }
+  </style>
 </head>
 
 <body>
-<div class="overlay">
 
-<h1>Buscar Equipo</h1>
+<div class="overlay"></div>
 
-<input type="text" id="busqueda" placeholder="Ej: RL, RN, VG...">
+<div class="content">
+  <h1>UNIDAD GUE13</h1>
+  <h1>Buscar Equipos de 380V</h1>
 
-<div id="resultados" class="resultados"></div>
+  <select id="barra">
+    <option value="Todas">Todas las Barras</option>
+    <option value="3 CA">3 CA</option>
+    <option value="3 CC">3 CC</option>
+    <option value="3 DZ">3 DZ</option>
+    <option value="3 OCA">3 OCA</option>
+    <option value="3 OCN">3 OCN</option>
+    <option value="3 OCP">3 OCP</option>
+  </select><br>
 
+  <input
+    type="text"
+    id="busqueda"
+    placeholder="Ingresar equipo (ej: RL, RN, VG)"
+  ><br>
+
+  <button onclick="buscar()">Buscar</button>
+
+  <div id="resultados" class="resultados"></div>
 </div>
 
 <script>
 let datos = [];
 
+/* === FULLSCREEN === */
+function goFullscreen() {
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) elem.requestFullscreen();
+}
+
+/* === CARGA CSV === */
 fetch("380.csv")
   .then(res => res.text())
   .then(texto => {
     const lineas = texto.split("\n");
-    const headers = lineas[0].split(";");
 
-    datos = lineas.slice(1).map(l => {
-      const c = l.split(";");
-      return {
-        equipo: c[0],
-        descripcion: c[1]
-      };
-    });
+    datos = lineas
+      .slice(1)
+      .filter(l => l.trim() !== "")
+      .map(l => {
+        const c = l.split(";");
+        return {
+          equipo: c[0]?.trim(),
+          descripcion: c[1]?.trim(),
+          barra: c[2]?.trim()
+        };
+      });
   });
 
-document.getElementById("busqueda").addEventListener("input", e => {
-  const valor = e.target.value.toLowerCase();
-  const contenedor = document.getElementById("resultados");
-  contenedor.innerHTML = "";
+/* === BUSCAR === */
+function buscar() {
+  goFullscreen();
 
-  if (valor.length === 0) return;
+  const texto = document.getElementById("busqueda").value.toLowerCase();
+  const barraSel = document.getElementById("barra").value;
+  const cont = document.getElementById("resultados");
+  cont.innerHTML = "";
 
-  const filtrados = datos.filter(d =>
-    d.equipo.toLowerCase().includes(valor.toLowerCase())
-  );
+  if (!texto) return;
+
+  const filtrados = datos.filter(d => {
+    if (!d.equipo) return false;
+
+    const coincideEquipo = d.equipo.toLowerCase().includes(texto);
+    const coincideBarra =
+      barraSel === "Todas" || d.barra === barraSel;
+
+    return coincideEquipo && coincideBarra;
+  });
 
   filtrados.forEach(d => {
     const card = document.createElement("div");
@@ -114,17 +188,10 @@ document.getElementById("busqueda").addEventListener("input", e => {
       <div class="equipo">${d.equipo}</div>
       <div class="desc">${d.descripcion}</div>
     `;
-
-    card.onclick = () => {
-      alert("Seleccionaste: " + d.equipo);
-      // acá después abrís la segunda pantalla o detalle
-    };
-
-    contenedor.appendChild(card);
+    cont.appendChild(card);
   });
-});
+}
 </script>
 
 </body>
 </html>
-
