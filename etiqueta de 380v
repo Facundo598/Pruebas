@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Pantalla 3 Contenedor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* PANTALLA */
+#pantalla3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  height: 100%;
+  padding-top: 50px;
+  box-sizing: border-box;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.contenedor-principal {
+  width: 90%;        
+  height: 35%;       
+  background: yellow;
+  border-radius: 10px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0,0,0,0.8);
+}
+
+/* IZQUIERDA */
+.izquierda {
+  width: 15%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.letra {
+  font-size: 6rem;
+  font-weight: bold;
+}
+
+/* DERECHA */
+.derecha {
+  width: 85%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bloque {
+  flex: 1;
+  background: yellow;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.bloque.medio {
+  display: flex;
+  gap: 5px;
+  padding: 10px;
+}
+.sub {
+  flex: 1;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+}
+.sub:nth-child(1) { flex: 3; }
+.sub:nth-child(2) { flex: 0.5; }
+.sub:nth-child(3) { flex: 2; }
+
+/* ACCIONES */
+.acciones-todas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 90%;
+  align-items: center;
+}
+.acciones {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+.campo-texto {
+  width: 50%;
+  height: 80px;
+  padding: 10px;
+  background: #eee;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+.acciones button {
+  width: 30%;
+  height: 80px;
+  font-size: 1.5rem;
+  border-radius: 6px;
+  border: none;
+  background: #00e0ff;
+  cursor: pointer;
+}
+.acciones button:hover {
+  background: #00bcd4;
+}
+</style>
+</head>
+
+<body>
+<div id="pantalla3">
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="contenedor-principal">
+    <div class="izquierda">
+      <div class="letra">A</div>
+    </div>
+    <div class="derecha">
+      <div class="bloque">CICLO- DESCARGA PPAL DE BOMBA RL 11</div>
+      <div class="bloque medio">
+        <div class="sub">3 CA</div>
+        <div class="sub">-</div>
+        <div class="sub">27</div>
+      </div>
+      <div class="bloque">380V -3CA-27B</div>
+    </div>
+  </div>
+
+  <!-- BLOQUE DE ACCIONES -->
+  <div class="acciones-todas">
+    <div class="acciones">
+      <button id="btn1">Enviar</button>
+      <input type="text" id="mostrar-texto1" class="campo-texto" readonly value="Texto del CSV">
+    </div>
+    <div class="acciones">
+      <button id="btn2">Enviar</button>
+      <input type="text" id="mostrar-texto2" class="campo-texto" readonly value="Texto del CSV">
+    </div>
+    <div class="acciones">
+      <button id="btn3">Enviar</button>
+      <input type="text" id="mostrar-texto3" class="campo-texto" readonly value="Texto del CSV">
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
