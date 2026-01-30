@@ -104,7 +104,7 @@ document.getElementById("busqueda").addEventListener("input", e => {
   if (valor.length === 0) return;
 
   const filtrados = datos.filter(d =>
-    d.equipo.toLowerCase().includes(valor)
+    d.equipo.toLowerCase().includes(valor.toLowerCase())
   );
 
   filtrados.forEach(d => {
