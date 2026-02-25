@@ -176,6 +176,51 @@ button:hover {
   <button class="volver" onclick="volver()">⬅ Volver al buscador</button>
 </div>
 
+
+<!-- ===== PANTALLA 3 (DETALLE EQUIPO) ===== -->
+<div id="pantalla3" class="pantalla">
+
+  <div class="contenedor-principal">
+    <div class="izquierda">
+      <div id="letraEquipo" class="letra">A</div>
+    </div>
+
+    <div class="derecha">
+      <div id="descEquipo" class="bloque"></div>
+
+      <div class="bloque medio">
+        <div id="barraEquipo" class="sub"></div>
+        <div class="sub">-</div>
+        <div id="celdaEquipo" class="sub"></div>
+      </div>
+
+      <div id="resumenEquipo" class="bloque"></div>
+    </div>
+  </div>
+
+  <div class="acciones-todas">
+    <div class="acciones">
+      <button>FU1</button>
+      <input id="fu1txt" class="campo-texto" readonly>
+    </div>
+
+    <div class="acciones">
+      <button>FU2</button>
+      <input id="fu2txt" class="campo-texto" readonly>
+    </div>
+
+    <div class="acciones">
+      <button>FA1</button>
+      <input id="fa1txt" class="campo-texto" readonly>
+    </div>
+  </div>
+
+  <button class="volver" onclick="activar('resultadosPantalla')">
+    ⬅ Volver
+  </button>
+
+</div>
+  
 <script>
 let datos = [];
 
@@ -203,7 +248,15 @@ fetch("380.csv")
       return {
         equipo: c[0]?.trim(),
         descripcion: c[1]?.trim(),
-        barra: c[2]?.trim()
+        barra: c[2]?.trim(),
+        celda: c[3]?.trim(),
+        fila: c[4]?.trim(),
+        resumen: c[5]?.trim(),
+        gabinete: c[7]?.trim(),
+        fu1: c[8]?.trim(),
+        fu2: c[9]?.trim(),
+        fa1: c[10]?.trim(),
+        contactor: c[11]?.trim()
       };
     });
   });
@@ -228,6 +281,7 @@ function buscar() {
       <div class="equipo">${d.equipo}</div>
       <div class="desc">${d.descripcion}</div>
     `;
+    c.onclick = () => mostrarDetalle(d);
     res.appendChild(c);
   });
 
@@ -237,6 +291,36 @@ function buscar() {
 /* === VOLVER === */
 function volver() {
   activar("buscador");
+}
+/* === MOSTRAR DETALLE === */
+function mostrarDetalle(d) {
+
+  // letra grande (primera del equipo)
+  document.getElementById("letraEquipo").textContent =
+    d.equipo?.charAt(0) || "-";
+
+  document.getElementById("descEquipo").textContent =
+    d.descripcion || "-";
+
+  document.getElementById("barraEquipo").textContent =
+    d.barra || "-";
+
+  document.getElementById("celdaEquipo").textContent =
+    d.celda || "-";
+
+  document.getElementById("resumenEquipo").textContent =
+    d.resumen || "-";
+
+  document.getElementById("fu1txt").value =
+    d.fu1 || "-";
+
+  document.getElementById("fu2txt").value =
+    d.fu2 || "-";
+
+  document.getElementById("fa1txt").value =
+    d.fa1 || "-";
+
+  activar("pantalla3");
 }
 </script>
 
