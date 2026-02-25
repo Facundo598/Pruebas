@@ -133,6 +133,111 @@ button:hover {
 .volver {
   align-self: center;
 }
+
+/* ===== PANTALLA 3 ===== */
+
+#pantalla3{
+  background:#222;
+  justify-content:center;
+  align-items:center;
+}
+
+.pantalla3-contenido{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:40px;
+  padding-top:50px;
+  box-sizing:border-box;
+}
+
+/* CONTENEDOR */
+.contenedor-principal {
+  width: 90%;
+  height: 35%;
+  background: yellow;
+  border-radius: 10px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0,0,0,0.8);
+}
+
+.izquierda {
+  width: 15%;
+  background: white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.letra {
+  font-size:6rem;
+  font-weight:bold;
+}
+
+.derecha {
+  width:85%;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.bloque {
+  flex:1;
+  background:yellow;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.5rem;
+  text-align:center;
+}
+
+.bloque.medio{
+  display:flex;
+  gap:5px;
+  padding:10px;
+}
+
+.sub{
+  flex:1;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:3rem;
+}
+
+.sub:nth-child(1){flex:3;}
+.sub:nth-child(2){flex:0.5;}
+.sub:nth-child(3){flex:2;}
+
+/* ACCIONES */
+.acciones-todas{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  width:90%;
+  align-items:center;
+}
+
+.acciones{
+  display:flex;
+  gap:20px;
+  width:100%;
+  justify-content:center;
+}
+
+.campo-texto{
+  width:50%;
+  height:80px;
+  font-size:1.2rem;
+  text-align:center;
+}
+
 </style>
 </head>
 
@@ -177,48 +282,53 @@ button:hover {
 </div>
 
 
-<!-- ===== PANTALLA 3 (DETALLE EQUIPO) ===== -->
+<!-- ===== PANTALLA 3 ===== -->
 <div id="pantalla3" class="pantalla">
 
-  <div class="contenedor-principal">
-    <div class="izquierda">
-      <div id="letraEquipo" class="letra">A</div>
-    </div>
+  <div class="pantalla3-contenido">
 
-    <div class="derecha">
-      <div id="descEquipo" class="bloque"></div>
-
-      <div class="bloque medio">
-        <div id="barraEquipo" class="sub"></div>
-        <div class="sub">-</div>
-        <div id="celdaEquipo" class="sub"></div>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="contenedor-principal">
+      <div class="izquierda">
+        <div id="letraEquipo" class="letra">A</div>
       </div>
 
-      <div id="resumenEquipo" class="bloque"></div>
+      <div class="derecha">
+        <div id="descEquipo" class="bloque"></div>
+
+        <div class="bloque medio">
+          <div id="barraEquipo" class="sub"></div>
+          <div class="sub">-</div>
+          <div id="celdaEquipo" class="sub"></div>
+        </div>
+
+        <div id="resumenEquipo" class="bloque"></div>
+      </div>
     </div>
+
+    <!-- ACCIONES -->
+    <div class="acciones-todas">
+      <div class="acciones">
+        <button>FU1</button>
+        <input id="fu1txt" class="campo-texto" readonly>
+      </div>
+
+      <div class="acciones">
+        <button>FU2</button>
+        <input id="fu2txt" class="campo-texto" readonly>
+      </div>
+
+      <div class="acciones">
+        <button>FA1</button>
+        <input id="fa1txt" class="campo-texto" readonly>
+      </div>
+    </div>
+
+    <button class="volver" onclick="activar('resultadosPantalla')">
+      ⬅ Volver
+    </button>
+
   </div>
-
-  <div class="acciones-todas">
-    <div class="acciones">
-      <button>FU1</button>
-      <input id="fu1txt" class="campo-texto" readonly>
-    </div>
-
-    <div class="acciones">
-      <button>FU2</button>
-      <input id="fu2txt" class="campo-texto" readonly>
-    </div>
-
-    <div class="acciones">
-      <button>FA1</button>
-      <input id="fa1txt" class="campo-texto" readonly>
-    </div>
-  </div>
-
-  <button class="volver" onclick="activar('resultadosPantalla')">
-    ⬅ Volver
-  </button>
-
 </div>
   
 <script>
