@@ -209,7 +209,7 @@ font-size:1.2rem;text-align:center;}
     }
 
     function mostrarDetalle(d){
-      document.getElementById("letraEquipo").textContent=d.equipo?.charAt(0) || "-";
+      document.getElementById("letraEquipo").textContent=d.fila || "-";
       document.getElementById("descEquipo").textContent=d.descripcion || "-";
       document.getElementById("barraEquipo").textContent=d.barra || "-";
       document.getElementById("celdaEquipo").textContent=d.celda || "-";
