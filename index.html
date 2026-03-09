@@ -6,416 +6,220 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
-}
+
+*{box-sizing:border-box;}
+
+html, body{margin:0;padding:0;width:100%;height:100%;font-family:Arial, sans-serif;overflow:hidden;}
 
 /* ===== PANTALLAS ===== */
-.pantalla {
-  position: absolute;
-  inset: 0;
-  display: none;
-}
-
-.pantalla.activa {
-  display: flex;
-}
+.pantalla{position:absolute;inset:0;display:none;}
+.pantalla.activa{display:flex;}
 
 /* ===== INICIO ===== */
-#inicio {
-  background: black;
-  align-items: center;
-  justify-content: center;
-}
-
-#inicio img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  cursor: pointer;
-}
+#inicio{background:black;align-items:center;justify-content:center;}
+#inicio img{max-width:100%;max-height:100%;object-fit:contain;cursor:pointer;}
 
 /* ===== BUSCADOR ===== */
-#buscador {
-  background-image: url("Sala.jpg");
-  background-size: cover;
-  background-position: center;
-  align-items: center;
-  justify-content: center;
-}
-
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-}
-
-.content {
-  position: relative;
-  z-index: 2;
-  color: white;
-  text-align: center;
-  width: 90%;
-  max-width: 900px;
-}
-
-h1 {
-  color: #5DDE82;
-}
-
-select, input {
-  font-size: 1.4rem;
-  padding: 11px 15px;
-  border-radius: 6px;
-  border: none;
-  margin-bottom: 15px;
-  width: 100%;
-  max-width: 420px;
-}
-
-button {
-  font-size: 1.2rem;
-  padding: 15px 30px;
-  border: none;
-  border-radius: 8px;
-  background: #00e0ff;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #00bcd4;
-}
+#buscador{background-image:url("Sala.jpg");background-size:cover;background-position:center;align-items:center;justify-content:center;}
+.overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);}
+.content{position:relative;z-index:2;color:white;text-align:center;width:90%;max-width:900px;}
+h1{color:#5DDE82;}
+select,input{font-size:1.4rem;padding:11px 15px;border-radius:6px;border:none;margin-bottom:15px;width:100%;max-width:420px;}
+button{font-size:1.2rem;padding:15px 30px;border:none;border-radius:8px;background:#00e0ff;cursor:pointer;}
+button:hover{background:#00bcd4;}
 
 /* ===== RESULTADOS ===== */
-#resultadosPantalla {
-  background: #111;
-  flex-direction: column;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.resultados-container {
-  flex: 1;
-  overflow-y: auto;
-  margin-bottom: 20px;
-  padding-right: 10px;
-}
-
-.resultados {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 15px;
-}
-
-.card {
-  background: white;
-  color: black;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-}
-
-.equipo {
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.desc {
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.volver {
-  align-self: center;
-}
+#resultadosPantalla{background:#111;flex-direction:column;padding:20px;}
+.resultados-container{flex:1;overflow-y:auto;margin-bottom:20px;padding-right:10px;}
+.resultados{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:15px;}
+.card{background:white;color:black;border-radius:8px;padding:15px;box-shadow:0 4px 10px rgba(0,0,0,0.25);}
+.equipo{font-weight:bold;font-size:1.2rem;}
+.desc{font-size:0.95rem;color:#333;}
+.volver{align-self:center;}
 
 /* ===== PANTALLA 3 ===== */
+#pantalla3{background:#222;flex-direction:column;align-items:center;gap:40px;padding-top:50px;}
 
-#pantalla3{
-  background:#222;
-  justify-content:center;
-  align-items:center;
-}
-
-.pantalla3-contenido{
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:40px;
-  padding-top:50px;
-  box-sizing:border-box;
-}
-
-/* CONTENEDOR */
-.contenedor-principal {
-  width: 90%;
-  height: 35%;
-  background: yellow;
-  border-radius: 10px;
-  display: flex;
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(0,0,0,0.8);
-}
-
-.izquierda {
-  width: 15%;
-  background: white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.letra {
-  font-size:6rem;
-  font-weight:bold;
-}
-
-.derecha {
-  width:85%;
-  padding:10px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.bloque {
-  flex:1;
-  background:yellow;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:1.5rem;
-  text-align:center;
-}
-
-.bloque.medio{
-  display:flex;
-  gap:5px;
-  padding:10px;
-}
-
-.sub{
-  flex:1;
-  border-radius:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:3rem;
-}
-
+/* CONTENEDOR PRINCIPAL */
+.contenedor-principal{width:90%;height:35%;background:yellow;border-radius:10px;display:flex;overflow:hidden;}
+.izquierda{width:15%;background:white;display:flex;align-items:center;justify-content:center;}
+.letra{font-size:6rem;font-weight:bold;}
+.derecha{width:85%;padding:10px;display:flex;flex-direction:column;gap:10px;}
+.bloque{flex:1;background:yellow;border-radius:12px;display:flex;align-items:center;justify-content:center;
+font-size:1.5rem;text-align:center;}
+.bloque.medio{display:flex;gap:5px;padding:10px;}
+.sub{flex:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;}
 .sub:nth-child(1){flex:3;}
 .sub:nth-child(2){flex:0.5;}
 .sub:nth-child(3){flex:2;}
 
-/* ACCIONES */
-.acciones-todas{  display:flex;  flex-direction:column;  gap:20px;  width:90%;  align-items:center;}
-.acciones{  display:flex;  gap:20px;  width:100%;  justify-content:center;}
-.campo-texto{  width:55%;  height:80px;  font-size:1.2rem;  text-align:center;}
-.acciones button {  width: 30%;  height: 80px;  font-size: 1.5rem;  background: #00e0ff;   text-align:center;}
+/* ===== ACCIONES ===== */
+.acciones-todas{width:90%;display:flex;gap:20px;}
+.acciones-izquierda{flex:1;display:flex;flex-direction:column;gap:20px;}
+.acciones-derecha{flex:2;display:flex;flex-direction:column;gap:20px;}
+.acciones-izquierda button{height:80px;font-size:1.5rem;padding:0;}
+
+/* CAMPOS DE TEXTO ACCIONES */
+.campo-texto{height:80px;font-size:1.2rem;text-align:center;width:100%;max-width:none;margin-bottom:0;}
 
 </style>
 </head>
-
 <body>
 
 <!-- ===== PANTALLA 0 ===== -->
-<div id="inicio" class="pantalla activa">
-  <img src="inicio.jpg" alt="Entrar" onclick="entrar()">
-</div>
+  <div id="inicio" class="pantalla activa">
+    <img src="inicio.jpg" onclick="entrar()">
+  </div>
 
 <!-- ===== PANTALLA 1 ===== -->
-<div id="buscador" class="pantalla">
-  <div class="overlay"></div>
+  <div id="buscador" class="pantalla">
+    <div class="overlay"></div>
+    <div class="content">
 
-  <div class="content">
-    <h1>UNIDAD GUE13</h1>
-    <h1>Buscar Equipos de 380V</h1>
+      <h1>UNIDAD GUE13</h1>
+      <h1>Buscar Equipos de 380V</h1>
+      
+      <select id="barra">
+        <option value="Todas">Todas las Barras</option>
+        <option value="3 CA">3 CA</option>
+        <option value="3 CC">3 CC</option>
+        <option value="3 DZ">3 DZ</option>
+        <option value="3 OCA">3 OCA</option>
+        <option value="3 OCN">3 OCN</option>
+        <option value="3 OCP">3 OCP</option>
+      </select>
+      <br>
+      <input id="busqueda" type="text" placeholder="Ej: RL, RN, VG">
+      <br>
 
-    <select id="barra">
-      <option value="Todas">Todas las Barras</option>
-      <option value="3 CA">3 CA</option>
-      <option value="3 CC">3 CC</option>
-      <option value="3 DZ">3 DZ</option>
-      <option value="3 OCA">3 OCA</option>
-      <option value="3 OCN">3 OCN</option>
-      <option value="3 OCP">3 OCP</option>
-    </select><br>
+      <button onclick="buscar()">Buscar</button>
 
-    <input id="busqueda" type="text" placeholder="Ej: RL, RN, VG"><br>
-
-    <button onclick="buscar()">Buscar</button>
+    </div>
   </div>
-</div>
 
 <!-- ===== PANTALLA 2 ===== -->
-<div id="resultadosPantalla" class="pantalla">
-  <div class="resultados-container">
-    <div id="resultados" class="resultados"></div>
+  <div id="resultadosPantalla" class="pantalla">
+    <div class="resultados-container">
+      <div id="resultados" class="resultados"></div>
+    </div>
+    <button class="volver" onclick="volver()">⬅ Volver al buscador</button>
   </div>
 
-  <button class="volver" onclick="volver()">⬅ Volver al buscador</button>
-</div>
-
-
 <!-- ===== PANTALLA 3 ===== -->
-<div id="pantalla3" class="pantalla">
-
-  <div class="pantalla3-contenido">
-
-    <!-- CONTENEDOR PRINCIPAL -->
+  <div id="pantalla3" class="pantalla">
+  
     <div class="contenedor-principal">
-      <div class="izquierda">
-        <div id="letraEquipo" class="letra">A</div>
-      </div>
-
-      <div class="derecha">
-        <div id="descEquipo" class="bloque"></div>
-
-        <div class="bloque medio">
-          <div id="barraEquipo" class="sub"></div>
-          <div class="sub">-</div>
-          <div id="celdaEquipo" class="sub"></div>
-        </div>
-
-        <div id="resumenEquipo" class="bloque"></div>
-      </div>
+    <div class="izquierda">
+      <div id="letraEquipo" class="letra">A</div>
     </div>
+    
+    <div class="derecha">
+      <div id="descEquipo" class="bloque"></div>
+      <div class="bloque medio">
+        <div id="barraEquipo" class="sub"></div>
+        <div class="sub">-</div>
+        <div id="celdaEquipo" class="sub"></div>
+      </div>
+      <div id="resumenEquipo" class="bloque"></div>
+    </div>
+  
+  </div>
 
-    <!-- ACCIONES -->
+<!-- ACCIONES -->
     <div class="acciones-todas">
-      <div class="acciones">
+      <div class="acciones-izquierda">
         <button>FU1</button>
-        <input id="fu1txt" class="campo-texto" readonly>
-      </div>
-
-      <div class="acciones">
         <button>FU2</button>
-        <input id="fu2txt" class="campo-texto" readonly>
+        <button>FA1</button>
       </div>
 
-      <div class="acciones">
-        <button>FA1</button>
+      <div class="acciones-derecha">
+        <input id="fu1txt" class="campo-texto" readonly>
+        <input id="fu2txt" class="campo-texto" readonly>
         <input id="fa1txt" class="campo-texto" readonly>
       </div>
     </div>
 
-    <button class="volver" onclick="activar('resultadosPantalla')">
-      ⬅ Volver
-    </button>
+    <button class="volver" onclick="activar('resultadosPantalla')">⬅ Volver</button>
 
   </div>
-</div>
-  
-<script>
-let datos = [];
 
-/* === ENTRAR === */
-function entrar() {
-  const el = document.documentElement;
-  if (el.requestFullscreen) el.requestFullscreen();
+  <script>
 
-  activar("buscador");
-}
+    let datos=[];
+    function entrar(){
+      const el=document.documentElement;
+      if(el.requestFullscreen)el.requestFullscreen();
+      activar("buscador");
+    }
 
-/* === CAMBIAR PANTALLA === */
-function activar(id) {
-  document.querySelectorAll(".pantalla").forEach(p => p.classList.remove("activa"));
-  document.getElementById(id).classList.add("activa");
-}
+    function activar(id){
+      document.querySelectorAll(".pantalla").forEach(p=>p.classList.remove("activa"));
+      document.getElementById(id).classList.add("activa");
+    }
 
-/* === CARGAR CSV === */
-fetch("380.csv")
-  .then(r => r.text())
-  .then(t => {
-    const l = t.split("\n");
-    datos = l.slice(1).filter(x => x.trim()).map(x => {
-      const c = x.split(";");
-      return {
-        equipo: c[0]?.trim(),
-        descripcion: c[1]?.trim(),
-        barra: c[2]?.trim(),
-        celda: c[3]?.trim(),
-        fila: c[4]?.trim(),
-        resumen: c[5]?.trim(),
-        gabinete: c[7]?.trim(),
-        fu1: c[8]?.trim(),
-        fu2: c[9]?.trim(),
-        fa1: c[10]?.trim(),
-        contactor: c[11]?.trim()
-      };
-    });
-  });
+    fetch("380.csv")
+      .then(r=>r.text())
+      .then(t=>{
+        const l=t.split("\n");
+        datos=l.slice(1).filter(x=>x.trim()).map(x=>{
+          const c=x.split(";");
+          return{
+            equipo:c[0]?.trim(),
+            descripcion:c[1]?.trim(),
+            barra:c[2]?.trim(),
+            celda:c[3]?.trim(),
+            fila:c[4]?.trim(),
+            resumen:c[5]?.trim(),
+            gabinete:c[7]?.trim(),
+            fu1:c[8]?.trim(),
+            fu2:c[9]?.trim(),
+            fa1:c[10]?.trim(),
+            contactor:c[11]?.trim()
+          };
+        });
+      });
 
-/* === BUSCAR === */
-function buscar() {
-  const texto = busqueda.value.toLowerCase();
-  const barra = document.getElementById("barra").value;
-  const res = document.getElementById("resultados");
-  res.innerHTML = "";
+    function buscar(){
+      const texto=busqueda.value.toLowerCase();
+      const barra=document.getElementById("barra").value;
+      const res=document.getElementById("resultados");
+      res.innerHTML="";
+      if(!texto)return;
+      datos.filter(d=>
+        d.equipo &&
+        d.equipo.toLowerCase().includes(texto) &&
+        (barra==="Todas" || d.barra===barra)
+                  ).forEach(d=>{
+        const c=document.createElement("div");
+        c.className="card";
+        c.innerHTML=`
+        <div class="equipo">${d.equipo}</div>
+        <div class="desc">${d.descripcion}</div>
+        `;
+        c.onclick=()=>mostrarDetalle(d);
+        res.appendChild(c);
+      });
+      
+      activar("resultadosPantalla");
+    }
 
-  if (!texto) return;
+    function volver(){
+      activar("buscador");
+    }
 
-  datos.filter(d =>
-    d.equipo &&
-    d.equipo.toLowerCase().includes(texto) &&
-    (barra === "Todas" || d.barra === barra)
-  ).forEach(d => {
-    const c = document.createElement("div");
-    c.className = "card";
-    c.innerHTML = `
-      <div class="equipo">${d.equipo}</div>
-      <div class="desc">${d.descripcion}</div>
-    `;
-    c.onclick = () => mostrarDetalle(d);
-    res.appendChild(c);
-  });
+    function mostrarDetalle(d){
+      document.getElementById("letraEquipo").textContent=d.equipo?.charAt(0) || "-";
+      document.getElementById("descEquipo").textContent=d.descripcion || "-";
+      document.getElementById("barraEquipo").textContent=d.barra || "-";
+      document.getElementById("celdaEquipo").textContent=d.celda || "-";
+      document.getElementById("resumenEquipo").textContent=d.resumen || "-";
+      document.getElementById("fu1txt").value=d.fu1 || "-";
+      document.getElementById("fu2txt").value=d.fu2 || "-";
+      document.getElementById("fa1txt").value=d.fa1 || "-";
+      activar("pantalla3");
+    }
 
-  activar("resultadosPantalla");
-}
-
-/* === VOLVER === */
-function volver() {
-  activar("buscador");
-}
-/* === MOSTRAR DETALLE === */
-function mostrarDetalle(d) {
-
-  // letra grande (primera del equipo)
-  document.getElementById("letraEquipo").textContent =
-    d.equipo?.charAt(0) || "-";
-
-  document.getElementById("descEquipo").textContent =
-    d.descripcion || "-";
-
-  document.getElementById("barraEquipo").textContent =
-    d.barra || "-";
-
-  document.getElementById("celdaEquipo").textContent =
-    d.celda || "-";
-
-  document.getElementById("resumenEquipo").textContent =
-    d.resumen || "-";
-
-  document.getElementById("fu1txt").value =
-    d.fu1 || "-";
-
-  document.getElementById("fu2txt").value =
-    d.fu2 || "-";
-
-  document.getElementById("fa1txt").value =
-    d.fa1 || "-";
-
-  activar("pantalla3");
-}
-</script>
-
+  </script>
 </body>
 </html>
