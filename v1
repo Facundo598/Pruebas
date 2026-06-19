@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:#f4f4f4;
+}
+
+.banner{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+.contenedor{
+    max-width:700px;
+    margin:20px auto 30vh auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,.1);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+    color:#333;
+}
+
+.seccion{
+    margin-top:25px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
+    color:#444;
+}
+
+input,
+select,
+button{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:16px;
+}
+
+button{
+    margin-top:10px;
+    background:#1976d2;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1565c0;
+}
+
+.oculto{
+    display:none;
+}
+
+#bienvenida{
+    margin-top:20px;
+    font-size:18px;
+    color:green;
+    font-weight:bold;
+    text-align:center;
+    line-height:1.6;
+}
+
+.error{
+    color:red !important;
+}
+
+#resultado{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;
+}
+
+</style>
+</head>
+<body>
+
+<img src="banner.jpg" class="banner" alt="Banner">
+
+<div class="contenedor">
+
+    <h1>Cuestionario de Relevamiento</h1>
+
+    <div class="seccion">
+
+        <label>DNI</label>
+
+        <input
+            type="text"
+            id="dni"
+            placeholder="Ingrese DNI">
+
+        <button onclick="buscarUsuario()">
+            Buscar
+        </button>
+
+    </div>
+
+    <div id="bienvenida"></div>
+
+    <!-- OPCION PRINCIPAL -->
+
+    <div id="paso1" class="seccion oculto">
+
+        <label>Seleccione una opción</label>
+
+        <select id="opcionPrincipal"
+                onchange="mostrarOpcion()">
+
+            <option value="">
+                Seleccione...
+            </option>
+
+            <option value="A">
+                Órdenes Médicas Generales
+            </option>
+
+            <option value="B">
+                Órdenes para Traumatología
+            </option>
+
+        </select>
+
+    </div>
+
+    <!-- OPCION A -->
+
+    <div id="opcionA" class="seccion oculto">
+
+        <label>Departamento</label>
+
+        <select id="departamento">
+
+            <option value="">
+                Seleccione...
+            </option>
+
+            <option>Anta</option>
+            <option>Cachi</option>
+            <option>Cafayate</option>
+            <option>Capital</option>
+            <option>Cerrillos</option>
+
+        </select>
+
+    </div>
+
+    <!-- ORDENES -->
+
+    <div id="ordenesDiv" class="seccion oculto">
+
+        <label>Orden Disponible</label>
+
+        <select id="ordenes">
+
+        </select>
+
+    </div>
+
+    <!-- ENVIAR -->
+
+    <div id="enviarDiv" class="seccion oculto">
+
+        <button onclick="enviarSolicitud()">
+            Enviar Solicitud
+        </button>
+
+    </div>
+
+    <div id="resultado"></div>
+
+</div>
+
+<script>
+
+const URL_API =
+"https://script.google.com/macros/s/AKfycbyqWzg327ovt70g4DqHWD3sAhrxrbWo5_PV4Zy5xV3QOGNTYkIP4ctULKcUx-GJEP0S/exec";
+
+let afiliado = null;
+
+function centrar(id){
+
+    const elemento =
+        document.getElementById(id);
+
+    setTimeout(() => {
+
+        elemento.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+    },300);
+
+}
+
+async function buscarUsuario(){
+
+    const dni =
+        document.getElementById("dni")
+        .value
+        .trim();
+
+    const bienvenida =
+        document.getElementById("bienvenida");
+
+    bienvenida.innerHTML =
+        "Buscando...";
+
+    bienvenida.classList.remove("error");
+
+    document
+        .getElementById("paso1")
+        .classList
+        .add("oculto");
+
+    document
+        .getElementById("opcionA")
+        .classList
+        .add("oculto");
+
+    document
+        .getElementById("ordenesDiv")
+        .classList
+        .add("oculto");
+
+    document
+        .getElementById("enviarDiv")
+        .classList
+        .add("oculto");
+
+    try{
+
+        const respuesta =
+            await fetch(
+                URL_API +
+                "?action=buscar&dni=" +
+                encodeURIComponent(dni)
+            );
+
+        const datos =
+            await respuesta.json();
+
+        if(datos.existe){
+
+            afiliado = datos;
+
+            bienvenida.innerHTML = `
+                Bienvenido ${datos.nombre} ${datos.apellido}
+                <br>
+                Plan: ${datos.plan}
+                <br>
+                Afiliado N°: ${datos.afiliado}
+            `;
+
+            document
+                .getElementById("paso1")
+                .classList
+                .remove("oculto");
+
+            centrar("paso1");
+
+        }else{
+
+            bienvenida.innerHTML =
+                "DNI no encontrado";
+
+            bienvenida.classList.add("error");
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        bienvenida.innerHTML =
+            "Error al consultar datos";
+
+        bienvenida.classList.add("error");
+    }
+}
+
+async function mostrarOpcion(){
+
+    const opcion =
+        document
+        .getElementById("opcionPrincipal")
+        .value;
+
+    document
+        .getElementById("opcionA")
+        .classList
+        .add("oculto");
+
+    document
+        .getElementById("ordenesDiv")
+        .classList
+        .add("oculto");
+
+    document
+        .getElementById("enviarDiv")
+        .classList
+        .add("oculto");
+
+    if(opcion === "A"){
+
+        document
+            .getElementById("opcionA")
+            .classList
+            .remove("oculto");
+
+        await cargarOrdenes();
+
+        centrar("opcionA");
+
+    }
+
+    if(opcion === "B"){
+
+        alert(
+            "Opción B aún no implementada"
+        );
+
+    }
+
+}
+
+async function cargarOrdenes(){
+  
+      const respuesta =
+        await fetch(
+            URL_API +
+            "?action=ordenes&dni=" +
+            encodeURIComponent(
+                afiliado.dni
+            )
+        );
+
+    const datos =
+        await respuesta.json();
+
+    const select =
+        document
+        .getElementById("ordenes");
+
+    // LIMPIA MENSAJES ANTERIORES
+    document
+        .getElementById("resultado")
+        .innerHTML = "";
+
+    select.innerHTML = "";
+  
+
+    if(
+        !datos.ordenesDisponibles ||
+        datos.ordenesDisponibles.length === 0
+    ){
+    
+        document
+            .getElementById("ordenesDiv")
+            .classList
+            .remove("oculto");
+    
+        select.innerHTML =
+            "<option>No disponible</option>";
+    
+        document
+            .getElementById("resultado")
+            .innerHTML =
+            "No cuenta con órdenes disponibles para este mes. Por favor póngase en contacto con la obra social.";
+    
+        document
+            .getElementById("resultado")
+            .style.color =
+            "red";
+    
+        document
+            .getElementById("enviarDiv")
+            .classList
+            .add("oculto");
+    
+        return;
+    }
+  
+  
+
+    datos.ordenesDisponibles
+        .forEach(orden=>{
+
+            const op =
+                document.createElement(
+                    "option"
+                );
+
+            op.value = orden;
+            op.textContent = orden;
+
+            select.appendChild(op);
+
+        });
+
+    document
+        .getElementById("ordenesDiv")
+        .classList
+        .remove("oculto");
+
+    document
+        .getElementById("enviarDiv")
+        .classList
+        .remove("oculto");
+
+}
+
+async function enviarSolicitud(){
+
+    const departamento =
+        document
+        .getElementById("departamento")
+        .value;
+
+    if(!departamento){
+
+        alert(
+            "Seleccione un departamento"
+        );
+
+        return;
+    }
+
+    const orden =
+        document
+        .getElementById("ordenes")
+        .value;
+
+    const tipoConsulta =
+        document
+        .getElementById("opcionPrincipal")
+        .value;
+
+    try{
+
+        const formData = new FormData();
+        
+        formData.append("dni", afiliado.dni);
+        formData.append("nombre", afiliado.nombre);
+        formData.append("apellido", afiliado.apellido);
+        formData.append("tipoConsulta", tipoConsulta);
+        formData.append("orden", orden);
+        formData.append("departamento", departamento);
+        
+        const respuesta = await fetch(
+            URL_API,
+            {
+                method:"POST",
+                body:formData
+            }
+        );
+
+        const datos =
+            await respuesta.json();
+
+        const resultado =
+            document
+            .getElementById("resultado");
+
+        if(datos.ok){
+
+            resultado.innerHTML =
+                "Solicitud guardada correctamente";
+
+            resultado.style.color =
+                "green";
+
+        }else{
+
+            resultado.innerHTML =
+                "Error al guardar la solicitud";
+
+            resultado.style.color =
+                "red";
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        document
+            .getElementById("resultado")
+            .innerHTML =
+            "Error de comunicación con el servidor";
+
+        document
+            .getElementById("resultado")
+            .style.color =
+            "red";
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
