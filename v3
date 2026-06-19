@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario</title>
+
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial, sans-serif;background:#f4f4f4;}
+
+.banner{
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+    object-fit: contain; /* Esto hace que el logo se achique entero sin recortarse */
+    background: white;   /* Le da un fondo blanco limpio por detrás */
+    padding: 10px 0;
+}
+.contenedor{
+    max-width:700px;
+    margin:20px auto 30vh auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,.1);}
+h1{text-align:center;margin-bottom:25px;color:#333;}
+.seccion{margin-top:25px;}
+label{display:block;margin-bottom:8px;
+    font-weight:bold;color:#444;}
+input,
+select,
+button{width:100%;padding:12px;
+    border:1px solid #ccc;border-radius:6px;
+    font-size:16px;}
+button{margin-top:10px;background:#1976d2;
+    color:white;border:none;cursor:pointer;}
+button:hover{background:#1565c0;}
+.oculto{display:none;}
+
+#bienvenida{
+    margin-top:20px;
+    font-size:18px;
+    color:green;
+    font-weight:bold;
+    text-align:center;
+    line-height:1.6;}
+.error{color:red !important;}
+
+#resultado{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;}
+
+</style>
+</head>
+<body>
+  
+<img src="https://sirelyf.org/wp-content/uploads/2023/04/OSFATLYF-salud-luz-y-fuerza-web-SiReLyF.png" class="banner" alt="Banner OSFATLYF">
+
+<div class="contenedor">
+    <h1>Cuestionario de Relevamiento</h1>
+
+    <div class="seccion">
+        <label>DNI</label>
+        <input type="text" id="dni" placeholder="Ingrese DNI">
+        <button onclick="buscarUsuario()">Buscar</button>
+    </div>
+
+    <div id="bienvenida"></div>
+
+    <div id="paso1" class="seccion oculto">
+        <label>Seleccione una opción</label>
+        <select id="opcionPrincipal" onchange="mostrarOpcion()">
+            <option value="">Seleccione...</option>
+            <option value="A">Órdenes Médicas Generales</option>
+            <option value="B">Órdenes para Traumatología</option>
+        </select>
+    </div>
+
+    <div id="opcionA" class="seccion oculto">
+        <label>Departamento</label>
+        <select id="departamento" onchange="cargarMunicipios()">
+            <option value="">Seleccione...</option>
+            <option>ANTA</option>
+            <option>CACHI</option>
+            <option>CAFAYATE</option>
+            <option>CAPITAL</option>
+            <option>GENERAL GÜEMES</option>
+            <option>SAN CARLOS</option>
+            <option>METAN</option>
+            <option>SAN MARTIN</option>
+        </select>
+        
+        <label style="margin-top:15px;">Municipio</label>
+        <select id="municipio">
+            <option value="">Seleccione un departamento primero</option>
+        </select>
+    </div>
+
+    <div id="ordenesDiv" class="seccion oculto">
+        <label>Orden Disponible</label>
+        <select id="ordenes"></select>
+    </div>
+
+    <div id="enviarDiv" class="seccion oculto">
+        <button onclick="enviarSolicitud()">Enviar Solicitud</button>
+    </div>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+
+const URL_API =
+"https://script.google.com/macros/s/AKfycbyqWzg327ovt70g4DqHWD3sAhrxrbWo5_PV4Zy5xV3QOGNTYkIP4ctULKcUx-GJEP0S/exec";
+  
+const municipiosPorDepartamento = {
+
+    "CACHI": ["CACHI","PAYOGASTA"],
+    "CAFAYATE": ["CAFAYATE"],
+    "CAPITAL": ["SALTA","SAN LORENZO"],
+    "GENERAL GÜEMES": ["CAMPO SANTO","EL BORDO","GENERAL GÜEMES"],
+    "SAN CARLOS": ["ANIMANA","SAN CARLOS","ANGASTACO"],
+    "ANTA": ["APOLINARIO SARAVIA","EL QUEBRACHAL",
+        "GENERAL PIZARRO","JOAQUIN V. GONZALEZ","LAS LAJITAS"],
+    "METAN": ["EL GALPON","RIO PIEDRAS","SAN JOSE DE METAN"],
+    "SAN MARTIN": ["AGUARAY","EMBARCACION","GENERAL BALLIVIAN",
+        "GENERAL MOSCONI","PROF. SALVADOR MAZZA","TARTAGAL"]
+};
+
+
+let afiliado = null;
+let ordenesDisponibles = [];
+
+function centrar(id){
+
+    const elemento =
+        document.getElementById(id);
+
+    setTimeout(() => {
+
+        elemento.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+    },300);
+
+}
+  
+  
+function cargarMunicipios() {
+    const departamento = document.getElementById("departamento").value;
+    const municipio = document.getElementById("municipio");
+
+    municipio.innerHTML = '<option value="">Seleccione...</option>';
+
+    if (!departamento) return;
+
+    municipiosPorDepartamento[departamento].forEach(item => {
+        const opcion = document.createElement("option");
+        opcion.value = item;
+        opcion.textContent = item;
+        municipio.appendChild(opcion);
+    });
+}
+
+
+async function buscarUsuario() {
+    const dni = document.getElementById("dni").value.trim();
+    const bienvenida = document.getElementById("bienvenida");
+
+    bienvenida.innerHTML = "Buscando...";
+    bienvenida.classList.remove("error");
+
+    // Ocultamos todas las secciones antes de la nueva búsqueda
+    document.getElementById("paso1").classList.add("oculto");
+    document.getElementById("opcionA").classList.add("oculto");
+    document.getElementById("ordenesDiv").classList.add("oculto");
+    document.getElementById("enviarDiv").classList.add("oculto");
+
+    try {
+        const respuesta = await fetch(URL_API + "?action=buscar&dni=" + encodeURIComponent(dni));
+        const datos = await respuesta.json();
+
+        if (datos.existe) {
+            afiliado = datos;
+            ordenesDisponibles = datos.ordenesDisponibles || [];
+
+            bienvenida.innerHTML = `
+                <strong>${datos.nombre}</strong><br>
+                Credencial: ${datos.credencial}<br>
+                Plan: ${datos.plan}<br>
+                Estado: ${datos.estado}
+            `;
+
+            document.getElementById("paso1").classList.remove("oculto");
+            centrar("paso1");
+        } else {
+            bienvenida.innerHTML = "DNI no encontrado";
+            bienvenida.classList.add("error");
+        }
+    } catch (error) {
+        console.error(error);
+        bienvenida.innerHTML = "Error al consultar datos";
+        bienvenida.classList.add("error");
+    }
+}
+
+
+async function mostrarOpcion() {
+    const opcion = document.getElementById("opcionPrincipal").value;
+
+    // Ocultamos todas las secciones por defecto
+    document.getElementById("opcionA").classList.add("oculto");
+    document.getElementById("ordenesDiv").classList.add("oculto");
+    document.getElementById("enviarDiv").classList.add("oculto");
+
+    if (opcion === "A") {
+        document.getElementById("opcionA").classList.remove("oculto");
+        const select = document.getElementById("ordenes");
+        select.innerHTML = "";
+        document.getElementById("resultado").innerHTML = "";
+
+        if (ordenesDisponibles.length === 0) {
+            document.getElementById("ordenesDiv").classList.remove("oculto");
+            select.innerHTML = "<option>No disponible</option>";
+            
+            const resultado = document.getElementById("resultado");
+            resultado.innerHTML = "No cuenta con órdenes disponibles para este mes.";
+            resultado.style.color = "red";
+        } else {
+            ordenesDisponibles.forEach(orden => {
+                const op = document.createElement("option");
+                op.value = orden;
+                op.textContent = orden;
+                select.appendChild(op);
+            });
+
+            document.getElementById("ordenesDiv").classList.remove("oculto");
+            document.getElementById("enviarDiv").classList.remove("oculto");
+        }
+        centrar("opcionA");
+    }
+
+    if (opcion === "B") {
+        alert("Opción B aún no implementada");
+    }
+}
+
+
+async function enviarSolicitud(){
+  
+    const departamento = document.getElementById("departamento").value;
+    if(!departamento){
+        alert("Seleccione un departamento");
+        return;
+    }
+  
+    const municipio = document.getElementById("municipio").value;
+    if(!municipio){
+        alert("Seleccione un municipio");
+        return;
+    }
+
+    const orden = document.getElementById("ordenes").value;
+    const tipoConsulta = document.getElementById("opcionPrincipal").value;
+
+    // Bloquear el botón temporalmente o avisar al usuario
+    const resultado = document.getElementById("resultado");
+    resultado.innerHTML = "Enviando solicitud...";
+    resultado.style.color = "blue";
+
+    try {
+        // Formateamos los parámetros como un formulario clásico (x-www-form-urlencoded)
+        const params = new URLSearchParams();
+        params.append("dni", afiliado.dni);
+        params.append("nombre", afiliado.nombre);
+        params.append("tipoConsulta", tipoConsulta);
+        params.append("orden", orden);
+        params.append("departamento", departamento);
+        params.append("municipio", municipio);
+        
+        // Hacemos el envío tradicional de formulario sin forzar JSON crudo
+        const respuesta = await fetch(URL_API, {
+            method: "POST",
+            body: params // Enviamos el objeto URLSearchParams directamente
+        });
+
+        // Al haber agregado el Header en el script, ahora sí podremos parsearlo normalmente
+        const datos = await respuesta.json();
+        console.log(datos);
+
+        if(datos.ok){
+            resultado.innerHTML = "Solicitud guardada correctamente";
+            resultado.style.color = "green";
+        } else {
+            // Si el backend responde 'ok: false' debido a duplicados u omisiones
+            resultado.innerHTML = datos.mensaje || "Error al guardar la solicitud";
+            resultado.style.color = "red";
+        }
+
+    } catch(error) {
+        console.error(error);
+        resultado.innerHTML = "Error de comunicación con el servidor";
+        resultado.style.color = "red";
+    }
+}
+
+
+</script>
+
+</body>
+</html>
