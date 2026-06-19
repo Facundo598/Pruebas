@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Búsqueda de Afiliado</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:#f4f4f4;
+    padding:40px 20px;
+}
+
+.contenedor{
+    max-width:500px;
+    margin:auto;
+}
+
+.buscador{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,.1);
+    margin-bottom:25px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    border:none;
+    border-radius:6px;
+    background:#1976d2;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1565c0;
+}
+
+/* TARJETA */
+
+.tarjeta-afiliado{
+    width:100%;
+    max-width:500px;
+    height:300px;
+
+    background-image:url('https://raw.githubusercontent.com/Facundo598/Pruebas/refs/heads/main/img/Tarjeta2.png');
+    background-size:cover;
+    background-position:center;
+
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.20);
+}
+
+.datos-tarjeta{
+    position:absolute;
+    top:40px;
+    left:30px;
+    right:30px;
+
+    color:block;
+    text-shadow:1px 1px 3px rgba(0,0,0,.5);
+}
+
+.nombre{font-size:16px;font-weight:bold;margin-bottom:15px;}
+.dato{font-size:16px; margin-bottom:8px;}
+.dato1{font-size:32px; margin-bottom:8px;}
+.dato2{font-size:11px; margin-bottom:8px;}
+
+</style>
+</head>
+<body>
+
+<div class="contenedor">
+
+    <div class="buscador">
+
+        <h1>Cuestionario de Relevamiento</h1>
+
+        <label>DNI</label>
+        <input type="text" id="dni" value="31193065">
+
+        <button>Buscar</button>
+
+    </div>
+
+    <div class="tarjeta-afiliado">
+
+        <div class="datos-tarjeta">
+            <div class="dato1"><b>OSFATLYF</b></div>
+          	<div class="dato2">
+              OBRA SOCIAL DE LA FEDERACION ARGENTINA<br>
+              DE TRABAJADORES DE LUZ Y FUERZA</div>
+
+            <div class="dato"><b>CARLOS ALBERTO PERALTA</b></div>
+            <div class="dato">Credencial: <b>29-02534-3/00</b></div>
+            <div class="dato">Plan: ESPECIAL</div>
+            <div class="dato">Estado: Activo</div>
+          <div class="dato">Delegación: Salta</div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
