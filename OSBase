@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OSFATLyF - Estructura Base</title>
+
+    <!-- Hojas de estilo externas obligatorias para el diseño (Bootstrap, Fuentes y Temas) -->
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/assets/css/bootstrap.min.css?ver=5.0.0' media='all' />
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/assets/css/fontawesome.min.css?ver=5.13.0' media='all' />
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/assets/css/main.css?ver=1.0.6' media='all' />
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/style.css?ver=1.0.6' media='all' />
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/assets/css/inline-style.css?ver=1.0.6' media='all' />
+    <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Rubik:400,500,600,700%7CPoppins:700,500,600&display=swap' media='all' />
+
+    <!-- Estilos personalizados optimizados para Header y Footer -->
+    <style id="doctio-inline-style-inline-css">
+        .site-branding img {
+            max-width: inherit;
+        }
+        /* [MENU DE HEADER] */
+        .main-navigation ul li a {
+            font-size: 15.5px;
+        }
+        .main-navigation ul li ul li a:hover, 
+        .main-navigation ul li ul li.current-menu-item > a {
+            color: #ffc107 !important;
+        }
+        .post-title a:hover {
+            color: #ffc107 !important;
+        }
+        /* [FOOTER WIDGETS] */
+        .footer-widget-area .widget-title, 
+        .footer-widget-area .widget_block h2 {
+            font-size: 18px;
+            color: #ffffff;
+            margin-bottom: 0px;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+        .wp-block-separator {
+            border-bottom: 2px solid;
+            color: #2062c4;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         ENCABEZADO (HEADER)
+         ========================================== -->
+    <header class="site-header header-style-one">
+        <div class="header-navigation-area">
+            <div class="container">
+                <div class="row align-items-center">
+                    <!-- Logo corporativo -->
+                    <div class="col-lg-3 col-6">
+                        <div class="site-branding">
+                            <img src="https://osfatlyf.org/wp-content/uploads/2024/10/logo_header-largo_180507.jpg" alt="OSFATLyF">
+                        </div>
+                    </div>
+                    
+                    <!-- Menú de Navegación principal -->
+                    <div class="col-lg-9 col-6 text-end">
+                        <nav id="site-navigation" class="main-navigation td-list-style">
+                            <div class="main-menu-container">
+                                <ul id="main-menu" class="menu">
+                                    <li class="menu-item"><a href="https://osfatlyf.org/">Inicio</a></li>
+                                    <li class="menu-item"><a href="#">Institucional</a></li>
+                                    <li class="menu-item"><a href="#">Planes de Salud</a></li>
+                                    <li class="menu-item"><a href="#">Prog. de Prevención</a></li>
+                                    <li class="menu-item"><a href="#">Prestadores y Servicios</a></li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================
+         CONTENIDO PRINCIPAL (TU CONTENIDO VA AQUÍ)
+         ========================================== -->
+    <main class="site-main" style="min-height: 400px; padding: 40px 0;">
+        <div class="container">
+            <!-- Espacio reservado para que agregues el cuerpo de tu web -->
+            <h2>Contenido de la página</h2>
+            <p>Este espacio está listo para agregar el cuerpo o la sección central de tu sitio web de forma limpia.</p>
+        </div>
+    </main>
+
+    <!-- ==========================================
+         PIE DE PÁGINA (FOOTER)
+         ========================================== -->
+    <footer class="site-footer td-cover-bg footer-style-one">
+        
+        <!-- Área Superior de Widgets -->
+        <div class="footer-widget-area" style="padding: 60px 0 30px;">
+            <div class="container">
+                <div class="row">
+                    
+                    <!-- Columna 1: Contacto -->
+                    <div id="block-12" class="widget col-lg-4 col-md-6 widget_block">
+                        <div class="wp-block-group">
+                            <h2 class="wp-block-heading">CONTACTO</h2>
+                            <hr class="wp-block-separator is-style-wide"/>
+                            <p class="wp-block-paragraph">Domicilio:<br> Carlos Pellegrini 525, Salta Capital</p>
+                            <figure class="wp-block-image size-full is-resized">
+                                <a href="https://www.argentina.gob.ar/sssalud" target="_blank" rel="noreferrer noopener">
+                                    <img decoding="async" width="200" src="https://osfatlyf.org/wp-content/uploads/2024/10/logo-sss-footer.png" alt="SSSalud" style="width:260px; height:auto"/>
+                                </a>
+                            </figure>
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: Descargas -->
+                    <div id="block-17" class="widget col-lg-4 col-md-6 widget_block">
+                        <div class="wp-block-group">
+                            <h2 class="wp-block-heading">DESCARGAS</h2>
+                            <hr class="wp-block-separator is-style-wide"/>
+                            <p class="wp-block-paragraph">
+                                <a href="http://osfatlyf.org/documentos/descargas-footer/formulario_cronicidad_pedido_medicamentos_v.201909.pdf" target="_blank" rel="noreferrer noopener">Formulario de Cronicidad</a><br>
+                                <a href="http://osfatlyf.org/documentos/descargas-footer/Formulario_PMI.pdf" target="_blank" rel="noreferrer noopener">Formulario PMI</a><br>
+                                <a href="http://osfatlyf.org/documentos/descargas-footer/Formulario_leches.pdf" target="_blank" rel="noreferrer noopener">Formulario Leches</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Columna 3: Servicios Internos -->
+                    <div id="block-32" class="widget col-lg-4 col-md-6 widget_block">
+                        <div class="wp-block-group">
+                            <h2 class="wp-block-heading">SERVICIOS INTERNOS</h2>
+                            <hr class="wp-block-separator is-style-wide"/>
+                            <p class="wp-block-paragraph"><a href="https://outlook.com/osfatlyf.org/" target="_blank" rel="noreferrer noopener">WEBMAIL</a></p>
+                            <p class="wp-block-paragraph"><a href="https://fatlyf.org/sindicatos/" target="_blank" rel="noreferrer noopener">TELÉFONOS SINDICATOS</a></p>
+                            <p class="wp-block-paragraph"><a href="https://osfatlyf.org/portal/guia-de-telefonos-ip/" target="_blank" rel="noreferrer noopener">GUÍA DE TELÉFONOS IP</a></p>
+                            <p class="wp-block-paragraph"><a href="http://historico.osfatlyf.org/osfatweb/servlet/hwwus0001" target="_blank" rel="noreferrer noopener">APLICACIONES</a></p>
+                            <p class="wp-block-paragraph"><a href="https://sistema.osfatlyf.org/" target="_blank" rel="noreferrer noopener">NUEVO SISTEMA</a></p>
+                            <p class="wp-block-paragraph"><a href="https://osfatlyf.org/vademecum-osfatlyf-pmo/" target="_blank" rel="noreferrer noopener">Vademecum OSFATLyF – PMO</a></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Área Inferior: Derechos de Autor -->
+        <div class="footer-bottom-area" style="padding: 20px 0; background: rgba(0,0,0,0.1);">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="footer-bottom-wrapper">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="site-info-left">
+                                        © 2026 OSFATLYF (SALTA)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 text-md-end">
+                                    <div class="site-copyright-text">
+                                        Desarrollado por OSFATLyF (Salta) - Peralta Carlos
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts requeridos de jQuery -->
+    <script src="https://osfatlyf.org/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
+</body>
+</html>
