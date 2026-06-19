@@ -1,0 +1,366 @@
+octype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OSFATLyF - Estructura Base</title>
+
+    <!-- Hojas de estilo externas obligatorias para el diseño (Bootstrap, Fuentes y Temas) -->
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/assets/css/bootstrap.min.css?ver=5.0.0' media='all' />
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/assets/css/fontawesome.min.css?ver=5.13.0' media='all' />
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/assets/css/main.css?ver=1.0.6' media='all' />
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/style.css?ver=1.0.6' media='all' />
+    <link rel='stylesheet' href='https://osfatlyf.org/wp-content/themes/doctio/assets/css/inline-style.css?ver=1.0.6' media='all' />
+    <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Rubik:400,500,600,700%7CPoppins:700,500,600&display=swap' media='all' />
+
+    <!-- Estilos personalizados optimizados para Header y Footer -->
+    <style id="doctio-inline-style-inline-css">
+        .site-branding img {
+            max-width: inherit;
+        }
+        /* [MENU DE HEADER] */
+        .main-navigation ul li a {
+            font-size: 15.5px;
+        }
+        .main-navigation ul li ul li a:hover, 
+        .main-navigation ul li ul li.current-menu-item > a {
+            color: #ffc107 !important;
+        }
+        .post-title a:hover {
+            color: #ffc107 !important;
+        }
+        /* [FOOTER WIDGETS] */
+        .footer-widget-area .widget-title, 
+        .footer-widget-area .widget_block h2 {
+            font-size: 18px;
+            color: #ffffff;
+            margin-bottom: 0px;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+        .wp-block-separator {
+            border-bottom: 2px solid;
+            color: #2062c4;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* ===================================================
+           ESTRUCTURACIÓN DEL MENÚ (OPTIMIZADO PARA JSEDITOR)
+           =================================================== */
+        #site-navigation {
+            display: block !important;
+            width: 100% !important;
+        }
+
+        /* Contenedor para tirar el botón a la izquierda */
+        .menu-trigger-container {
+            text-align: left !important;
+            padding-left: 15px;
+            margin: 10px 0;
+        }
+
+        /* Botón estilo hamburguesa blanco (Visible hasta 1200px) */
+        .menu-toggle-btn {
+            display: inline-flex !important; 
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff !important;
+            border: 1px solid #cccccc !important;
+            color: #2062c4 !important;
+            font-size: 24px !important;
+            line-height: 1;
+            cursor: pointer !important;
+            padding: 8px 12px !important;
+            border-radius: 4px !important;
+        }
+        .menu-toggle-btn:hover {
+            background-color: #f8f9fa !important;
+            border-color: #b3b3b3 !important;
+        }
+
+        /* Contenedor del menú colapsable */
+        .main-menu-container {
+            display: none; /* Oculto por defecto en pantallas compactas */
+            width: 100% !important;
+            background-color: #ffffff !important;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.15) !important;
+            border-radius: 4px !important;
+            padding: 10px 0 !important;
+            margin-top: 10px !important;
+            text-align: left !important;
+        }
+        
+        /* Clase que fuerza el despliegue inmediato con JS */
+        .main-menu-container.show-menu {
+            display: block !important;
+        }
+
+        /* Lista de opciones en formato vertical */
+        .main-menu-container .menu {
+            display: flex !important;
+            flex-direction: column !important;
+            list-style: none !important;
+            margin: 0 !important;
+            padding: 0 15px !important;
+        }
+        .main-menu-container .menu-item {
+            width: 100% !important;
+            border-bottom: 1px solid #eef2f5 !important;
+            position: relative !important;
+            float: none !important; /* Resetea el comportamiento nativo de la plantilla */
+        }
+        .main-menu-container .menu-item a {
+            display: block !important;
+            padding: 14px 10px !important;
+            color: #333333 !important;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        /* Submenús - Corrección de posicionamiento secuencial */
+        .main-menu-container .sub-menu {
+            display: none; 
+            position: relative !important; /* Lo mantiene dentro del flujo natural del elemento padre */
+            top: 0 !important;
+            left: 0 !important;
+            float: none !important;
+            width: 100% !important;
+            list-style: none !important;
+            background-color: #f8f9fa !important;
+            padding-left: 20px !important;
+            margin: 0 !important;
+            border-left: 3px solid #ffc107 !important;
+            box-shadow: none !important;
+        }
+        
+        /* Fuerza a que el submenú se abra justo debajo del enlace padre */
+        .main-menu-container .sub-menu.show-submenu {
+            display: block !important;
+        }
+        
+        .menu-item-has-children > a::after {
+            content: ' ▼';
+            font-size: 11px;
+            float: right;
+            color: #2062c4;
+        }
+
+        /* ===================================================
+           VISTA PC ESCRITORIO (Solo si la pantalla es gigante)
+           =================================================== */
+        @media (min-width: 1201px) {
+            .menu-trigger-container {
+                display: none !important;
+            }
+            .main-menu-container {
+                display: block !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                text-align: center !important;
+            }
+            .main-menu-container .menu {
+                flex-direction: row !important;
+                justify-content: center !important;
+            }
+            .main-menu-container .menu-item {
+                width: auto !important;
+                margin: 0 15px !important;
+                border: none !important;
+            }
+            .main-menu-container .sub-menu {
+                position: absolute !important;
+                top: 100% !important;
+                left: 0 !important;
+                min-width: 200px !important;
+                border-left: none !important;
+                border-top: 3px solid #ffc107 !important;
+            }
+            .main-menu-container .menu-item:hover > .sub-menu {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         ENCABEZADO (HEADER)
+         ========================================== -->
+    <header class="site-header" style="padding: 15px 0; background: #ffffff; border-bottom: 1px solid #eef2f5;">
+        <div class="container">
+            
+            <!-- LOGO -->
+            <div class="row text-center mb-2">
+                <div class="col-12">
+                    <div class="site-branding">
+                        <img src="https://osfatlyf.org/wp-content/uploads/2024/10/logo_header-largo_180507.jpg" alt="OSFATLyF">
+                    </div>
+                </div>
+            </div>
+
+            <!-- NAVEGACIÓN -->
+            <div class="row">
+                <div class="col-12">
+                    
+                    <!-- Contenedor alineado a la izquierda para el botón móvil -->
+                    <div class="menu-trigger-container">
+                        <button class="menu-toggle-btn" id="mobile-menu-trigger" title="Menú">
+                            &#9776;
+                        </button>
+                    </div>
+
+                    <!-- Menú principal -->
+                    <nav id="site-navigation" class="main-navigation">
+                        <div class="main-menu-container" id="menu-container">
+                            <ul class="menu">
+                                <li class="menu-item"><a href="https://osfatlyf.org/">Inicio</a></li>
+                                
+                                <li class="menu-item menu-item-has-children">
+                                    <a href="#" class="submenu-toggle">Institucional</a>
+                                    <ul class="sub-menu">
+                                        <li><a href="#">Autoridades</a></li>
+                                        <li><a href="#">Delegaciones</a></li>
+                                        <li><a href="#">Contacto</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="menu-item menu-item-has-children">
+                                    <a href="#" class="submenu-toggle">Planes de Salud</a>
+                                    <ul class="sub-menu">
+                                        <li><a href="#">Plan PMO</a></li>
+                                        <li><a href="#">Planes Complementarios</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="menu-item"><a href="#">Prog. de Prevención</a></li>
+                                <li class="menu-item"><a href="#">Prestadores y Servicios</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ==========================================
+         CONTENIDO PRINCIPAL
+         ========================================== -->
+    <main style="min-height: 400px; padding: 40px 0; background: #f8f9fa;">
+        <div class="container">
+            <h2>Contenido de la página</h2>
+            <p>Este espacio está listo para agregar el cuerpo o la sección central de tu sitio web de forma limpia.</p>
+        </div>
+    </main>
+
+    <!-- ==========================================
+         PIE DE PÁGINA (FOOTER REINCORPORADO)
+         ========================================== -->
+    <footer class="site-footer td-cover-bg footer-style-one">
+        
+        <!-- Área Superior de Widgets -->
+        <div class="footer-widget-area" style="padding: 60px 0 30px;">
+            <div class="container">
+                <div class="row">
+                    
+                    <!-- Columna 1: Contacto -->
+                    <div id="block-12" class="widget col-lg-4 col-md-6 widget_block">
+                        <div class="wp-block-group">
+                            <h2 class="wp-block-heading">CONTACTO</h2>
+                            <hr class="wp-block-separator is-style-wide"/>
+                            <p class="wp-block-paragraph">Domicilio:<br> Carlos Pellegrini 525, Salta Capital</p>
+                            <figure class="wp-block-image size-full is-resized">
+                                <a href="https://www.argentina.gob.ar/sssalud" target="_blank" rel="noreferrer noopener">
+                                    <img decoding="async" width="200" src="https://osfatlyf.org/wp-content/uploads/2024/10/logo-sss-footer.png" alt="SSSalud" style="width:260px; height:auto"/>
+                                </a>
+                            </figure>
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: Descargas -->
+                    <div id="block-17" class="widget col-lg-4 col-md-6 widget_block">
+                        <div class="wp-block-group">
+                            <h2 class="wp-block-heading">DESCARGAS</h2>
+                            <hr class="wp-block-separator is-style-wide"/>
+                            <p class="wp-block-paragraph">
+                                <a href="http://osfatlyf.org/documentos/descargas-footer/formulario_cronicidad_pedido_medicamentos_v.201909.pdf" target="_blank" rel="noreferrer noopener">Formulario de Cronicidad</a><br>
+                                <a href="http://osfatlyf.org/documentos/descargas-footer/Formulario_PMI.pdf" target="_blank" rel="noreferrer noopener">Formulario PMI</a><br>
+                                <a href="http://osfatlyf.org/documentos/descargas-footer/Formulario_leches.pdf" target="_blank" rel="noreferrer noopener">Formulario Leches</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Columna 3: Servicios Internos -->
+                    <div id="block-32" class="widget col-lg-4 col-md-6 widget_block">
+                        <div class="wp-block-group">
+                            <h2 class="wp-block-heading">SERVICIOS INTERNOS</h2>
+                            <hr class="wp-block-separator is-style-wide"/>
+                            <p class="wp-block-paragraph"><a href="https://outlook.com/osfatlyf.org/" target="_blank" rel="noreferrer noopener">WEBMAIL</a></p>
+                            <p class="wp-block-paragraph"><a href="https://fatlyf.org/sindicatos/" target="_blank" rel="noreferrer noopener">TELÉFONOS SINDICATOS</a></p>
+                            <p class="wp-block-paragraph"><a href="https://osfatlyf.org/portal/guia-de-telefonos-ip/" target="_blank" rel="noreferrer noopener">GUÍA DE TELÉFONOS IP</a></p>
+                            <p class="wp-block-paragraph"><a href="http://historico.osfatlyf.org/osfatweb/servlet/hwwus0001" target="_blank" rel="noreferrer noopener">APLICACIONES</a></p>
+                            <p class="wp-block-paragraph"><a href="https://sistema.osfatlyf.org/" target="_blank" rel="noreferrer noopener">NUEVO SISTEMA</a></p>
+                            <p class="wp-block-paragraph"><a href="https://osfatlyf.org/vademecum-osfatlyf-pmo/" target="_blank" rel="noreferrer noopener">Vademecum OSFATLyF – PMO</a></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Área Inferior: Derechos de Autor -->
+        <div class="footer-bottom-area" style="padding: 20px 0; background: rgba(0,0,0,0.1);">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="footer-bottom-wrapper">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="site-info-left">
+                                        © 2026 OSFATLYF (SALTA)
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 text-md-end">
+                                    <div class="site-copyright-text">
+                                        Desarrollado por OSFATLyF (Salta) - Peralta Carlos
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVIDAD CON JAVASCRIPT PURO (Inmune a bloqueos) -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var menuTrigger = document.getElementById('mobile-menu-trigger');
+            var menuContainer = document.getElementById('menu-container');
+
+            // 1. Abrir y cerrar el menú principal
+            if (menuTrigger && menuContainer) {
+                menuTrigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    menuContainer.classList.toggle('show-menu');
+                });
+            }
+
+            // 2. Abrir y cerrar los submenús internos (Institucional / Planes)
+            var subMenuToggles = document.querySelectorAll('.submenu-toggle');
+            subMenuToggles.forEach(function(toggle) {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var subMenu = this.nextElementSibling;
+                    if (subMenu && subMenu.classList.contains('sub-menu')) {
+                        subMenu.classList.toggle('show-submenu');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
