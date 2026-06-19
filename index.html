@@ -1,225 +1,93 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Buscador 380V</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Osfatlyf</title>
 
-<style>
+  <style>
+    * {margin: 0;padding: 0;box-sizing: border-box;}
 
-*{box-sizing:border-box;}
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-html, body{margin:0;padding:0;width:100%;height:100%;font-family:Arial, sans-serif;overflow:hidden;}
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      /* MÁS ANCHO */
+      width: 100%;
+      max-width: 900px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.6s ease;
+    }
 
-/* ===== PANTALLAS ===== */
-.pantalla{position:absolute;inset:0;display:none;}
-.pantalla.activa{display:flex;}
+    /* MÁS PADDING EN PANTALLAS GRANDES */
+    @media (min-width: 900px) {
+      .card {padding: 60px;}
+      h1 {font-size: 36px;}
+      .btn {font-size: 20px;padding: 18px;}}
 
-/* ===== INICIO ===== */
-#inicio{background:black;align-items:center;justify-content:center;}
-#inicio img{max-width:100%;max-height:100%;object-fit:contain;cursor:pointer;}
+    h1 {font-size: 30px;margin-bottom: 10px;font-weight: 600;}
+    p {margin-bottom: 25px;font-size: 16px;opacity: 0.8;}
 
-/* ===== BUSCADOR ===== */
-#buscador{background-image:url("Sala.jpg");background-size:cover;background-position:center;align-items:center;justify-content:center;}
-.overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);}
-.content{position:relative;z-index:2;color:white;text-align:center;width:90%;max-width:900px;}
-h1{color:#5DDE82;}
-select,input{font-size:1.4rem;padding:11px 15px;border-radius:6px;border:none;margin-bottom:15px;width:100%;max-width:420px;}
-button{font-size:1.2rem;padding:15px 30px;border:none;border-radius:8px;background:#00e0ff;cursor:pointer;}
-button:hover{background:#00bcd4;}
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      background: #3b82f6;
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 500;
+      transition: 0.2s ease;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+    }
 
-/* ===== RESULTADOS ===== */
-#resultadosPantalla{background:#111;flex-direction:column;padding:20px;}
-.resultados-container{flex:1;overflow-y:auto;margin-bottom:20px;padding-right:10px;}
-.resultados{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:15px;}
-.card{background:white;color:black;border-radius:8px;padding:15px;box-shadow:0 4px 10px rgba(0,0,0,0.25);}
-.equipo{font-weight:bold;font-size:1.2rem;}
-.desc{font-size:0.95rem;color:#333;}
-.volver{align-self:center;}
+    .btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.45);
+    }
 
-/* ===== PANTALLA 3 ===== */
-#pantalla3{background:#222;flex-direction:column;align-items:center;gap:40px;padding-top:50px;}
+    footer {margin-top: 25px;font-size: 14px;opacity: 0.6;}
 
-/* CONTENEDOR PRINCIPAL */
-.contenedor-principal{width:90%;height:35%;background:yellow;border-radius:10px;display:flex;overflow:hidden;}
-.izquierda{width:15%;background:white;display:flex;align-items:center;justify-content:center;}
-.letra{font-size:4rem;font-weight:bold;}
-.derecha{width:85%;padding:10px;display:flex;flex-direction:column;gap:10px;}
-.bloque{flex:1;background:yellow;border-radius:12px;display:flex;align-items:center;justify-content:center;
-font-size:1.2rem;text-align:center;}
-.bloque.medio{display:flex;gap:5px;padding:10px;}
-.sub{flex:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;}
-.sub:nth-child(1){flex:3;}
-.sub:nth-child(2){flex:0.5;}
-.sub:nth-child(3){flex:2;}
-
-/* ===== ACCIONES ===== */
-.acciones-todas{width:90%;display:flex;gap:20px;}
-.acciones-izquierda{flex:1;display:flex;flex-direction:column;gap:20px;}
-.acciones-derecha{flex:2;display:flex;flex-direction:column;gap:20px;}
-.acciones-izquierda button{height:80px;font-size:1.5rem;padding:0;}
-
-/* CAMPOS DE TEXTO ACCIONES */
-.campo-texto{height:80px;font-size:1.2rem;text-align:center;width:100%;max-width:none;margin-bottom:0;}
-
-</style>
+    @keyframes fadeIn {
+      from {opacity: 0;transform: translateY(20px);}
+      to {opacity: 1;transform: translateY(0);}
+    }
+  </style>
 </head>
+
 <body>
+  <div class="card">
+    <h1>Bienvenido</h1>
+    <p>Elegí una sección para continuar</p>
 
-<!-- ===== PANTALLA 0 ===== -->
-  <div id="inicio" class="pantalla activa">
-    <img src="inicio.jpg" onclick="entrar()">
+    <a href=Tarjeta1.html class="btn">Tarjeta1</a>
+    <a href=Tarjeta2.html class="btn">Tarjeta2</a>
+    //<a href= class="btn"></a>
+    <a href="https://facundo598.github.io/Calculadora-Intereses/" class="btn">Calculadora de Intereses</a>
+    <a href="https://facu-598.github.io/Datos/" class="btn">Calendario de Turno</a>
+    <a href="RegistroLaboral/RegLab.html" class="btn">Registro Laboral</a>
+    <a href=casa-luz.html class="btn">Casa Luminaria</a>
+    <a href="Arduino/Firebase/Realtime.html" class="btn">ESP con Firebase Realtime</a>
+    <a href="Antena/antena.html" class="btn">Antena TDA</a>
+    <a href="kali/kal.html" class="btn">Auditoria</a>
+
+    <footer>© 2025 - Tu Sitio</footer>
   </div>
-
-<!-- ===== PANTALLA 1 ===== -->
-  <div id="buscador" class="pantalla">
-    <div class="overlay"></div>
-    <div class="content">
-
-      <h1>UNIDAD GUE13</h1>
-      <h1>Buscar Equipos de 380V</h1>
-      
-      <select id="barra">
-        <option value="Todas">Todas las Barras</option>
-        <option value="3 CA">3 CA</option>
-        <option value="3 CC">3 CC</option>
-        <option value="3 DZ">3 DZ</option>
-        <option value="3 OCA">3 OCA</option>
-        <option value="3 OCN">3 OCN</option>
-        <option value="3 OCP">3 OCP</option>
-      </select>
-      <br>
-      <input id="busqueda" type="text" placeholder="Ej: RL, RN, VG">
-      <br>
-
-      <button onclick="buscar()">Buscar</button>
-
-    </div>
-  </div>
-
-<!-- ===== PANTALLA 2 ===== -->
-  <div id="resultadosPantalla" class="pantalla">
-    <div class="resultados-container">
-      <div id="resultados" class="resultados"></div>
-    </div>
-    <button class="volver" onclick="volver()">⬅ Volver al buscador</button>
-  </div>
-
-<!-- ===== PANTALLA 3 ===== -->
-  <div id="pantalla3" class="pantalla">
-  
-    <div class="contenedor-principal">
-    <div class="izquierda">
-      <div id="letraEquipo" class="letra">A</div>
-    </div>
-    
-    <div class="derecha">
-      <div id="descEquipo" class="bloque"></div>
-      <div class="bloque medio">
-        <div id="barraEquipo" class="sub"></div>
-        <div class="sub">-</div>
-        <div id="celdaEquipo" class="sub"></div>
-      </div>
-      <div id="resumenEquipo" class="bloque"></div>
-    </div>
-  
-  </div>
-
-<!-- ACCIONES -->
-    <div class="acciones-todas">
-      <div class="acciones-izquierda">
-        <button>FU1</button>
-        <button>FU2</button>
-        <button>FA1</button>
-      </div>
-
-      <div class="acciones-derecha">
-        <input id="fu1txt" class="campo-texto" readonly>
-        <input id="fu2txt" class="campo-texto" readonly>
-        <input id="fa1txt" class="campo-texto" readonly>
-      </div>
-    </div>
-
-    <button class="volver" onclick="activar('resultadosPantalla')">⬅ Volver</button>
-
-  </div>
-
-  <script>
-
-    let datos=[];
-    function entrar(){
-      const el=document.documentElement;
-      if(el.requestFullscreen)el.requestFullscreen();
-      activar("buscador");
-    }
-
-    function activar(id){
-      document.querySelectorAll(".pantalla").forEach(p=>p.classList.remove("activa"));
-      document.getElementById(id).classList.add("activa");
-    }
-
-    fetch("380.csv")
-      .then(r=>r.text())
-      .then(t=>{
-        const l=t.split("\n");
-        datos=l.slice(1).filter(x=>x.trim()).map(x=>{
-          const c=x.split(";");
-          return{
-            equipo:c[0]?.trim(),
-            descripcion:c[1]?.trim(),
-            barra:c[2]?.trim(),
-            celda:c[3]?.trim(),
-            fila:c[4]?.trim(),
-            resumen:c[5]?.trim(),
-            gabinete:c[6]?.trim(),
-            fu1:c[7]?.trim(),
-            fu2:c[8]?.trim(),
-            fa1:c[9]?.trim(),
-            contactor:c[10]?.trim()
-          };
-        });
-      });
-
-    function buscar(){
-      const texto=busqueda.value.toLowerCase();
-      const barra=document.getElementById("barra").value;
-      const res=document.getElementById("resultados");
-      res.innerHTML="";
-      if(!texto)return;
-      datos.filter(d=>
-        d.equipo &&
-        d.equipo.toLowerCase().includes(texto) &&
-        (barra==="Todas" || d.barra===barra)
-                  ).forEach(d=>{
-        const c=document.createElement("div");
-        c.className="card";
-        c.innerHTML=`
-        <div class="equipo">${d.equipo}</div>
-        <div class="desc">${d.descripcion}</div>
-        `;
-        c.onclick=()=>mostrarDetalle(d);
-        res.appendChild(c);
-      });
-      
-      activar("resultadosPantalla");
-    }
-
-    function volver(){
-      activar("buscador");
-    }
-
-    function mostrarDetalle(d){
-      document.getElementById("letraEquipo").textContent=d.fila || "-";
-      document.getElementById("descEquipo").textContent=d.descripcion || "-";
-      document.getElementById("barraEquipo").textContent=d.barra || "-";
-      document.getElementById("celdaEquipo").textContent=d.celda || "-";
-      document.getElementById("resumenEquipo").textContent=d.resumen || "-";
-      document.getElementById("fu1txt").value=d.fu1 || "-";
-      document.getElementById("fu2txt").value=d.fu2 || "-";
-      document.getElementById("fa1txt").value=d.fa1 || "-";
-      activar("pantalla3");
-    }
-
-  </script>
 </body>
 </html>
