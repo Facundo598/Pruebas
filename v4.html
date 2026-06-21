@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario</title> 
+
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial, sans-serif;background:#f4f4f4;}
+
+.banner{
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+    object-fit: contain; /* Esto hace que el logo se achique entero sin recortarse */
+    background: white;   /* Le da un fondo blanco limpio por detrás */
+    padding: 10px 0;
+}
+.contenedor{
+    max-width:700px;
+    margin:20px auto 30vh auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,.1);}
+h1{text-align:center;margin-bottom:25px;color:#333;}
+.seccion{margin-top:25px;}
+label{display:block;margin-bottom:8px;
+    font-weight:bold;color:#444;}
+input,
+select,
+button{width:100%;padding:12px;
+    border:1px solid #ccc;border-radius:6px;
+    font-size:16px;}
+button{margin-top:10px;background:#1976d2;
+    color:white;border:none;cursor:pointer;}
+button:hover{background:#1565c0;}
+.oculto{display:none;}
+.oculto-planilla {display: none !important;}
+
+#bienvenida{
+    margin-top:20px;
+    font-size:18px;
+    color:green;
+    font-weight:bold;
+    text-align:center;
+    line-height:1.6;}
+.error{color:red !important;}
+
+#resultado{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;}
+
+/* Nuevos estilos para los radio buttons de pago */
+.opciones-pago {margin-top: 10px;}
+.opcion-radio {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+.opcion-radio input[type="radio"] {
+    width: auto;margin-right: 10px;cursor: pointer;}
+.opcion-radio span {font-size: 16px;color: #333;}
+
+</style>
+</head>
+<body>
+  
+<img src="https://sirelyf.org/wp-content/uploads/2023/04/OSFATLYF-salud-luz-y-fuerza-web-SiReLyF.png" class="banner" alt="Banner OSFATLYF">
+
+<div class="contenedor">
+    <h1>Cuestionario de Relevamiento</h1>
+
+    <div class="seccion">
+        <label>DNI</label>
+        <input type="text" id="dni" placeholder="Ingrese DNI">
+        <button onclick="buscarUsuario()">Buscar</button>
+    </div>
+
+    <div id="bienvenida"></div>
+
+    <div id="paso1" class="seccion oculto">
+        <label>Seleccione una opción</label>
+        <select id="opcionPrincipal" onchange="mostrarOpcion()">
+            <option value="">Seleccione...</option>
+            <option value="A">Órdenes Médicas Generales</option>
+            <option value="B">Órdenes para Traumatología</option>
+        </select>
+    </div>
+
+    <div id="opcionA" class="seccion oculto">
+        <label>Departamento</label>
+        <select id="departamento" onchange="cargarMunicipios()">
+            <option value="">Seleccione...</option>
+            <option>ANTA</option>
+            <option>CACHI</option>
+            <option>CAFAYATE</option>
+            <option>CAPITAL</option>
+            <option>GENERAL GÜEMES</option>
+            <option>SAN CARLOS</option>
+            <option>METAN</option>
+            <option>SAN MARTIN</option>
+        </select>
+        
+        <label style="margin-top:15px;">Municipio</label>
+        <select id="municipio">
+            <option value="">Seleccione un departamento primero</option>
+        </select>
+    </div>
+
+    <div id="ordenesDiv" class="seccion oculto">
+        <label>Orden Disponible</label>
+        <select id="ordenes"></select>
+    </div>
+
+    <div id="pagoDiv" class="seccion oculto">
+        <label>¿Cómo desea realizar el pago?</label>
+        <div class="opciones-pago">
+            <label class="opcion-radio" id="opcionPlanillaLabel">
+                <input type="radio" name="metodoPago" value="Descuento por planilla" onchange="cambioMetodoPago()">
+                <span>Descuento por planilla</span>
+            </label>
+            <label class="opcion-radio">
+                <input type="radio" name="metodoPago" value="Transferencia bancaria" onchange="cambioMetodoPago()">
+                <span>Transferencia bancaria: cvu</span>
+            </label>
+        </div>
+    </div>
+  
+    <div id="comprobanteDiv" class="seccion oculto">
+        <label>Subir comprobante de transferencia (Formato imagen: JPG, PNG)</label>
+        <input type="file" id="comprobanteInput" accept="image/jpeg, image/png">
+    </div>
+
+    <div id="enviarDiv" class="seccion oculto">
+        <button onclick="enviarSolicitud()">Enviar Solicitud</button>
+    </div>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+
+const URL_API =
+"https://script.google.com/macros/s/AKfycbyqWzg327ovt70g4DqHWD3sAhrxrbWo5_PV4Zy5xV3QOGNTYkIP4ctULKcUx-GJEP0S/exec";
+  
+const municipiosPorDepartamento = {
+
+    "CACHI": ["CACHI","PAYOGASTA"],
+    "CAFAYATE": ["CAFAYATE"],
+    "CAPITAL": ["SALTA","SAN LORENZO"],
+    "GENERAL GÜEMES": ["CAMPO SANTO","EL BORDO","GENERAL GÜEMES"],
+    "SAN CARLOS": ["ANIMANA","SAN CARLOS","ANGASTACO"],
+    "ANTA": ["APOLINARIO SARAVIA","EL QUEBRACHAL",
+        "GENERAL PIZARRO","JOAQUIN V. GONZALEZ","LAS LAJITAS"],
+    "METAN": ["EL GALPON","RIO PIEDRAS","SAN JOSE DE METAN"],
+    "SAN MARTIN": ["AGUARAY","EMBARCACION","GENERAL BALLIVIAN",
+        "GENERAL MOSCONI","PROF. SALVADOR MAZZA","TARTAGAL"]
+};
+
+
+let afiliado = null;
+let ordenesDisponibles = [];
+
+function centrar(id){
+
+    const elemento =
+        document.getElementById(id);
+
+    setTimeout(() => {
+
+        elemento.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+    },300);
+
+}
+  
+  
+function cargarMunicipios() {
+    const departamento = document.getElementById("departamento").value;
+    const municipio = document.getElementById("municipio");
+
+    municipio.innerHTML = '<option value="">Seleccione...</option>';
+
+    if (!departamento) return;
+
+    municipiosPorDepartamento[departamento].forEach(item => {
+        const opcion = document.createElement("option");
+        opcion.value = item;
+        opcion.textContent = item;
+        municipio.appendChild(opcion);
+    });
+}
+
+
+async function buscarUsuario() {
+    const dni = document.getElementById("dni").value.trim();
+    const bienvenida = document.getElementById("bienvenida");
+
+    bienvenida.innerHTML = "Buscando...";
+    bienvenida.classList.remove("error");
+
+    // Ocultamos todas las secciones antes de la nueva búsqueda
+    document.getElementById("paso1").classList.add("oculto");
+    document.getElementById("opcionA").classList.add("oculto");
+    document.getElementById("ordenesDiv").classList.add("oculto");
+    document.getElementById("pagoDiv").classList.add("oculto");
+    document.getElementById("comprobanteDiv").classList.add("oculto");
+    document.getElementById("enviarDiv").classList.add("oculto");
+
+    try {
+        const respuesta = await fetch(URL_API + "?action=buscar&dni=" + encodeURIComponent(dni));
+        const datos = await respuesta.json();
+
+        if (datos.existe) {
+            afiliado = datos;
+            ordenesDisponibles = datos.ordenesDisponibles || [];
+
+            bienvenida.innerHTML = `
+                <strong>${datos.nombre}</strong><br>
+                Credencial: ${datos.credencial}<br>
+                Plan: ${datos.plan}<br>
+                Estado: ${datos.estado}
+            `;
+
+            document.getElementById("paso1").classList.remove("oculto");
+            centrar("paso1");
+        } else {
+            bienvenida.innerHTML = "DNI no encontrado";
+            bienvenida.classList.add("error");
+        }
+    } catch (error) {
+        console.error(error);
+        bienvenida.innerHTML = "Error al consultar datos";
+        bienvenida.classList.add("error");
+    }
+}
+
+
+async function mostrarOpcion() {
+    const opcion = document.getElementById("opcionPrincipal").value;
+
+    // Ocultamos todas las secciones por defecto y reseteamos el pago
+    document.getElementById("opcionA").classList.add("oculto");
+    document.getElementById("ordenesDiv").classList.add("oculto");
+    document.getElementById("pagoDiv").classList.add("oculto");
+    document.getElementById("comprobanteDiv").classList.add("oculto");
+    document.getElementById("enviarDiv").classList.add("oculto");
+    
+    // Desmarcar radios de pago y resetear input file
+    const radiosPago = document.getElementsByName("metodoPago");
+    radiosPago.forEach(r => r.checked = false);
+    document.getElementById("comprobanteInput").value = "";
+
+    if (opcion === "A") {
+        document.getElementById("opcionA").classList.remove("oculto");
+        const select = document.getElementById("ordenes");
+        select.innerHTML = "";
+        document.getElementById("resultado").innerHTML = "";
+
+        if (ordenesDisponibles.length === 0) {
+            document.getElementById("ordenesDiv").classList.remove("oculto");
+            select.innerHTML = "<option>No disponible</option>";
+            
+            const resultado = document.getElementById("resultado");
+            resultado.innerHTML = "No cuenta con órdenes disponibles para este mes.";
+            resultado.style.color = "red";
+        } else {
+            ordenesDisponibles.forEach(orden => {
+                const op = document.createElement("option");
+                // Lo que se envía al Apps Script
+                op.value = orden.id;
+                // Lo que ve el usuario
+              	const precioFormateado = `$${orden.precio.toLocaleString('es-AR')}`;
+                op.textContent = `${orden.nombre} (${precioFormateado})`;
+                select.appendChild(op);
+            });
+          
+            document.getElementById("ordenesDiv").classList.remove("oculto");
+            document.getElementById("pagoDiv").classList.remove("oculto"); // Mostramos la sección de pago
+            
+            // ===================================================
+            // CONTROL DINÁMICO AGREGADO: Filtro Activo/Pasivo
+            // ===================================================
+            const labelPlanilla = document.getElementById("opcionPlanillaLabel");
+            
+            if (afiliado && afiliado.trabajador && afiliado.trabajador.toUpperCase() === "ACTIVO") {
+                labelPlanilla.classList.remove("oculto-planilla"); // Muestra el botón si es Activo
+            } else {
+                labelPlanilla.classList.add("oculto-planilla");    // Oculta con !important si es Pasivo
+            }
+            // ===================================================
+
+            document.getElementById("enviarDiv").classList.remove("oculto");
+        }
+        centrar("opcionA");
+    }
+
+    if (opcion === "B") {
+        alert("Opción B aún no implementada");
+    }
+}
+
+// NUEVA FUNCIÓN: Controla la visibilidad del campo de comprobante según la selección
+function cambioMetodoPago() {
+    const metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked')?.value;
+    const comprobanteDiv = document.getElementById("comprobanteDiv");
+
+    if (metodoSeleccionado === "Transferencia bancaria") {
+        comprobanteDiv.classList.remove("oculto");
+        centrar("comprobanteDiv");
+    } else {
+        comprobanteDiv.classList.add("oculto");
+        document.getElementById("comprobanteInput").value = ""; // Limpiar archivo si cambia a planilla
+    }
+}
+
+// NUEVA FUNCIÓN AUXILIAR: Convierte un archivo a Base64 para poder enviarlo por POST
+function archivoABase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            // El resultado viene como "data:image/jpeg;base64,xxxxxx..." -> extraemos solo el contenido base64
+            const base64String = reader.result.split(',')[1];
+            resolve(base64String);
+        };
+        reader.onerror = error => reject(error);
+    });
+}
+
+async function enviarSolicitud(){
+  
+    const departamento = document.getElementById("departamento").value;
+    if(!departamento){alert("Seleccione un departamento");return;}
+  
+    const municipio = document.getElementById("municipio").value;
+    if(!municipio){alert("Seleccione un municipio");return;}
+
+    const orden = document.getElementById("ordenes").value; // Envía "CM1", "COA1", etc.
+
+    // VALIDACIÓN: Verificar que seleccionó método de pago
+    const metodoPago = document.querySelector('input[name="metodoPago"]:checked')?.value;
+    if(!metodoPago){alert("Por favor, seleccione un método de pago");return;}
+
+    // VALIDACIÓN: Si es transferencia, exigir la imagen del comprobante
+    let archivoBase64 = "";
+    let nombreArchivo = "";
+    if (metodoPago === "Transferencia bancaria") {
+        const fileInput = document.getElementById("comprobanteInput");
+        if (fileInput.files.length === 0) {
+            alert("Por favor, suba el comprobante de la transferencia");
+            return;
+        }
+        const file = fileInput.files[0];
+        nombreArchivo = file.name;
+        
+        // Convertimos la imagen antes de enviar
+        try {
+            archivoBase64 = await archivoABase64(file);
+        } catch (e) {
+            alert("Error al procesar la imagen del comprobante");
+            return;
+        }
+    }
+
+    // Bloquear el botón temporalmente o avisar al usuario
+    const resultado = document.getElementById("resultado");
+    resultado.innerHTML = "Enviando solicitud...";
+    resultado.style.color = "blue";
+
+    try {
+        // Formateamos los parámetros como un formulario clásico (x-www-form-urlencoded)
+        const params = new URLSearchParams();
+        params.append("dni", afiliado.dni);
+        params.append("nombre", afiliado.nombre);
+        params.append("orden", orden); // El backend usará esto para saber qué orden es y buscar su nombre real
+        params.append("departamento", departamento);
+        params.append("municipio", municipio);
+        params.append("metodoPago", metodoPago);
+        params.append("archivoBase64", archivoBase64); 
+        params.append("nombreArchivo", nombreArchivo); 
+        
+        // Hacemos el envío tradicional de formulario
+        const respuesta = await fetch(URL_API, {
+            method: "POST",
+            body: params 
+        });
+
+        const datos = await respuesta.json();
+        console.log(datos);
+
+        if(datos.ok){
+            resultado.innerHTML = "Solicitud guardada correctamente";
+            resultado.style.color = "green";
+        } else {
+            resultado.innerHTML = datos.mensaje || "Error al guardar la solicitud";
+            resultado.style.color = "red";
+        }
+
+    } catch(error) {
+        console.error(error);
+        resultado.innerHTML = "Error de comunicación con el servidor";
+        resultado.style.color = "red";
+    }
+}
+
+</script>
+
+</body>
+</html>
