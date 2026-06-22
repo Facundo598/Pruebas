@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Auto-Login y Carga Micam",
+  "version": "1.4",
+  "description": "Rellena credenciales y automatiza la carga de solicitudes en Micam",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://micamsalud.com.ar/*",
+        "*://pagos.micamsalud.com.ar/*",
+        "http://localhost/*", 
+        "file:///*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ]
+}
