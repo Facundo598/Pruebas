@@ -104,17 +104,8 @@
     </div>
 
     <script>
-        // --- Tu Script de Logueo Existente (Intacto) ---
-        document.getElementById('btn-iniciar-logueo').addEventListener('click', () => {
-            const usuario = document.getElementById('ext-usuario').value;
-            const pass = document.getElementById('ext-password').value;
-            localStorage.setItem('login_usuario', usuario);
-            localStorage.setItem('login_password', pass);
-            window.open('https://micamsalud.com.ar/', '_blank');
-        });
-
         // URL de tu documento exportado como CSV directamente
-		const CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSiiYMixUIZ6hwbT0nNVfQQrHvR1P5YYnKEtfZGlo3Nj_uV0Q3he3aIkUIKyir4_zSIEFywa7aljpya/pub?gid=5587092&single=true&output=csv`;
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSiiYMixUIZ6hwbT0nNVfQQrHvR1P5YYnKEtfZGlo3Nj_uV0Q3he3aIkUIKyir4_zSIEFywa7aljpya/pub?gid=5587092&single=true&output=csv`;
 
         async function cargarDatosSheet() {
             try {
@@ -137,7 +128,7 @@
                     const metodoPago = fila[10]?.trim();
                     const estado = fila[12]?.trim() ? fila[13].trim().toLowerCase() : '';
 
-                    // FILTRO: Si dice "concluido", lo ignora. Si está vacío o es otra cosa, lo toma como pendiente.
+                    // FILTRO: Si dice "concluido", lo ignora.
                     if (estado === 'concluido') {
                         continue; 
                     }
@@ -145,14 +136,14 @@
                     // Creamos el elemento de la fila HTML
                     const tr = document.createElement('tr');
                     
-                    // Guardamos la información completa en los atributos 'data-' de la fila por si la extensión los necesita todos
+                    // Guardamos la información completa en los atributos 'data-'
                     tr.dataset.dni = dni;
                     tr.dataset.nombre = nombre;
                     tr.dataset.orden = ordenNombre;
                     tr.dataset.precio = precio;
                     tr.dataset.prestador = prestador;
                     tr.dataset.pago = metodoPago;
-                    tr.dataset.filaIndex = i + 1; // Para saber qué número de fila es en el Sheet más adelante
+                    tr.dataset.filaIndex = i + 1;
 
                     tr.innerHTML = `
                         <td>${dni}</td>
@@ -174,7 +165,7 @@
                     cuerpoTabla.innerHTML = `<tr><td colspan="7" class="estado-carga">No hay órdenes pendientes. 🎉</td></tr>`;
                 }
 
-                // Asignar eventos a los botones generados dinámicamente
+                // Asignar eventos solo al botón concluir. El de copiar lo maneja la extensión.
                 asignarEventosBotones();
 
             } catch (error) {
@@ -183,7 +174,7 @@
             }
         }
 
-        // Función auxiliar para parsear correctamente filas CSV que tengan comas dentro de comillas (ej. nombres o montos)
+        // Función auxiliar para parsear correctamente filas CSV
         async function textToLines(text) {
             const lines = [];
             let row = [""];
@@ -210,38 +201,6 @@
         }
 
         function asignarEventosBotones() {
-            // Acción del Botón "Copiar Datos"
-            document.querySelectorAll('.btn-copiar').forEach(boton => {
-                boton.addEventListener('click', (e) => {
-                    const fila = e.target.closest('tr');
-                    
-					// 1. Capturamos los datos de la fila para los pasos siguientes (DNI, prestador, etc.)
-                    const datosFila = {
-                        dni: fila.dataset.dni,
-                        nombre: fila.dataset.nombre,
-                        orden: fila.dataset.orden,
-                        precio: fila.dataset.precio,
-                        prestador: fila.dataset.prestador,
-                        pago: fila.dataset.pago
-                    };
-            
-                    // 2. Capturamos el usuario y contraseña de los inputs superiores
-                    const usuarioHTML = document.getElementById('ext-usuario').value;
-                    const passwordHTML = document.getElementById('ext-password').value;
-            
-                    // 3. Guardamos en el localStorage EXACTAMENTE con las mismas claves que usa tu botón de arriba
-                    localStorage.setItem('login_usuario', usuarioHTML);
-                    localStorage.setItem('login_password', passwordHTML);
-                    localStorage.setItem('datos_orden_pendiente', JSON.stringify(datosFila));
-                    
-                    console.log("Datos y credenciales copiados correctamente.");
-          // alert(`Datos de ${datosFila.nombre} copiados. ¡Listo para la extensión!`);
-                    
-                    // 4. Abrimos Micam (va a disparar el mismo comportamiento que el botón superior)
-                    window.open('https://micamsalud.com.ar/', '_blank');
-                });
-            });
-
             // Acción del Botón "Concluir" (Visual por ahora)
             document.querySelectorAll('.btn-concluir').forEach(boton => {
                 boton.addEventListener('click', (e) => {
