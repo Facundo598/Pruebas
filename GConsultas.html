@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Consultas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;background-color: #f4f6f9;
+            margin: 0;padding: 20px;color: #333;}
+        .container {
+            max-width: 1100px; /* Ensanchado para la tabla */
+            margin: 0 auto;background: #fff;padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        h1 {
+            font-size: 24px;margin-bottom: 20px;
+            color: #2c3e50;border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;}
+        .login-trigger-bar {
+            display: flex;align-items: center;
+            gap: 15px;background-color: #f8f9fa;
+            padding: 15px;border-radius: 6px;
+            border: 1px solid #e2e8f0;flex-wrap: wrap;
+            margin-bottom: 30px;}
+        .input-group {display: flex;align-items: center;gap: 8px;}
+        label {font-size: 14px;font-weight: bold;color: #4a5568;}
+        input[type="text"] {
+            padding: 8px 12px;border: 1px solid #cbd5e0;
+            border-radius: 4px;font-size: 14px;
+            width: 160px;outline: none;
+            transition: border-color 0.2s;}
+        input[type="text"]:focus {border-color: #3182ce;}
+        .btn-disparar {
+            background-color: #3182ce;color: white;
+            border: none;padding: 8px 16px;
+            font-size: 14px;font-weight: bold;
+            border-radius: 4px;cursor: pointer;
+            transition: background-color 0.2s;}
+        .btn-disparar:hover {background-color: #2b6cb0;}
+
+        /* --- Estilos Nuevos para la Tabla --- */
+        .table-container {overflow-x: auto;margin-top: 20px;}
+        table {
+            width: 100%;border-collapse: collapse;
+            font-size: 14px;text-align: left;}
+        th, td {padding: 12px 15px;border-bottom: 1px solid #e2e8f0;}
+        th {background-color: #edf2f7;color: #4a5568;font-weight: bold;}
+        tr:hover {background-color: #f8fafc;}
+        .btn-accion {
+            padding: 6px 12px;font-size: 12px;
+            font-weight: bold;border-radius: 4px;
+            cursor: pointer;border: none;
+            margin-right: 5px;min-width: 110px;
+        	margin-bottom: 6px;}
+        .btn-copiar {background-color: #38a169;color: black;}
+        .btn-copiar:hover {background-color: #2f855a;}
+        .btn-concluir {background-color: #e53e3e;color: white;}
+        .btn-concluir:hover {background-color: #c53030;}
+        .estado-carga {
+            text-align: center;padding: 20px;
+            font-style: italic;color: #718096;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestión de Consultas</h1>
+        
+        <div class="login-trigger-bar">
+            <div class="input-group">
+                <label for="ext-usuario">Usuario:</label>
+                <input type="text" id="ext-usuario" value="Cperalta">
+            </div>
+            <div class="input-group">
+                <label for="ext-password">Contraseña:</label>
+                <input type="text" id="ext-password" value="916adm194">
+            </div>
+            <button type="button" id="btn-iniciar-logueo" class="btn-disparar">
+                Iniciar Logueo
+            </button>
+        </div>
+
+        <h2>Órdenes Pendientes</h2>
+        <div class="table-container">
+            <table id="tabla-consultas">
+                <thead>
+                    <tr>
+                        <th>DNI</th>
+                        <th>Nombre</th>
+                        <th>Orden</th>
+                        <th>Precio</th>
+                        <th>Prestador</th>
+                        <th>Método de Pago</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla">
+                    <tr>
+                        <td colspan="7" class="estado-carga">Cargando datos desde Google Sheets...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // --- Tu Script de Logueo Existente (Intacto) ---
+        document.getElementById('btn-iniciar-logueo').addEventListener('click', () => {
+            const usuario = document.getElementById('ext-usuario').value;
+            const pass = document.getElementById('ext-password').value;
+            localStorage.setItem('login_usuario', usuario);
+            localStorage.setItem('login_password', pass);
+            window.open('https://micamsalud.com.ar/', '_blank');
+        });
+
+        // --- Nuevo Script para Leer el Sheet ---
+        // URL de tu documento exportado como CSV directamente
+        const SHEET_ID = '1GuFelpOscJXPz6-1FNONdbL5M6HW26ChboPEoliSpGw';
+        const GID_HOJA2 = '5587092';
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_HOJA2}`;
+
+        async function cargarDatosSheet() {
+            try {
+                const respuesta = await fetch(CSV_URL);
+                const datosTexto = await textToLines(await respuesta.text());
+                
+                const cuerpoTabla = document.getElementById('cuerpo-tabla');
+                cuerpoTabla.innerHTML = ''; // Limpiamos el mensaje de carga
+
+                // La primera línea (índice 0) son los encabezados. Recorremos desde la 1.
+                for (let i = 1; i < datosTexto.length; i++) {
+                    const fila = datosTexto[i];
+                    if (fila.length < 5) continue; // Salta filas vacías accidentales
+
+                    const dni = fila[2]?.trim();
+                    const nombre = fila[3]?.trim();
+                    const ordenNombre = fila[5]?.trim();
+                    const precio = fila[6]?.trim();
+                    const prestador = fila[9]?.trim();
+                    const metodoPago = fila[10]?.trim();
+                    const estado = fila[12]?.trim() ? fila[13].trim().toLowerCase() : '';
+
+                    // FILTRO: Si dice "concluido", lo ignora. Si está vacío o es otra cosa, lo toma como pendiente.
+                    if (estado === 'concluido') {
+                        continue; 
+                    }
+
+                    // Creamos el elemento de la fila HTML
+                    const tr = document.createElement('tr');
+                    
+                    // Guardamos la información completa en los atributos 'data-' de la fila por si la extensión los necesita todos
+                    tr.dataset.dni = dni;
+                    tr.dataset.nombre = nombre;
+                    tr.dataset.orden = ordenNombre;
+                    tr.dataset.precio = precio;
+                    tr.dataset.prestador = prestador;
+                    tr.dataset.pago = metodoPago;
+                    tr.dataset.filaIndex = i + 1; // Para saber qué número de fila es en el Sheet más adelante
+
+                    tr.innerHTML = `
+                        <td>${dni}</td>
+                        <td>${nombre}</td>
+                        <td>${ordenNombre}</td>
+                        <td>$${precio}</td>
+                        <td>${prestador}</td>
+                        <td>${metodoPago}</td>
+                        <td>
+                            <button class="btn-accion btn-copiar">Copiar Datos</button>
+                            <button class="btn-accion btn-concluir">Concluir</button>
+                        </td>
+                    `;
+                    
+                    cuerpoTabla.appendChild(tr);
+                }
+
+                if (cuerpoTabla.children.length === 0) {
+                    cuerpoTabla.innerHTML = `<tr><td colspan="7" class="estado-carga">No hay órdenes pendientes. 🎉</td></tr>`;
+                }
+
+                // Asignar eventos a los botones generados dinámicamente
+                asignarEventosBotones();
+
+            } catch (error) {
+                console.error("Error al cargar el Sheet:", error);
+                document.getElementById('cuerpo-tabla').innerHTML = `<tr><td colspan="7" class="estado-carga" style="color:red;">Error al conectar con Google Sheets. Asegúrate de que el enlace esté compartido como Lector.</td></tr>`;
+            }
+        }
+
+        // Función auxiliar para parsear correctamente filas CSV que tengan comas dentro de comillas (ej. nombres o montos)
+        async function textToLines(text) {
+            const lines = [];
+            let row = [""];
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i+1];
+                if (c === '"') {
+                    if (inQuotes && next === '"') { row[row.length - 1] += '"'; i++; }
+                    else { inQuotes = !inQuotes; }
+                } else if (c === ',' && !inQuotes) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    lines.push(row);
+                    row = [''];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') lines.push(row);
+            return lines;
+        }
+
+        function asignarEventosBotones() {
+            // Acción del Botón "Copiar Datos"
+            document.querySelectorAll('.btn-copiar').forEach(boton => {
+                boton.addEventListener('click', (e) => {
+                    const fila = e.target.closest('tr');
+                    
+					// 1. Capturamos los datos de la fila para los pasos siguientes (DNI, prestador, etc.)
+                    const datosFila = {
+                        dni: fila.dataset.dni,
+                        nombre: fila.dataset.nombre,
+                        orden: fila.dataset.orden,
+                        precio: fila.dataset.precio,
+                        prestador: fila.dataset.prestador,
+                        pago: fila.dataset.pago
+                    };
+            
+                    // 2. Capturamos el usuario y contraseña de los inputs superiores
+                    const usuarioHTML = document.getElementById('ext-usuario').value;
+                    const passwordHTML = document.getElementById('ext-password').value;
+            
+                    // 3. Guardamos en el localStorage EXACTAMENTE con las mismas claves que usa tu botón de arriba
+                    localStorage.setItem('login_usuario', usuarioHTML);
+                    localStorage.setItem('login_password', passwordHTML);
+                    localStorage.setItem('datos_orden_pendiente', JSON.stringify(datosFila));
+                    
+                    console.log("Datos y credenciales copiados correctamente.");
+          // alert(`Datos de ${datosFila.nombre} copiados. ¡Listo para la extensión!`);
+                    
+                    // 4. Abrimos Micam (va a disparar el mismo comportamiento que el botón superior)
+                    window.open('https://micamsalud.com.ar/', '_blank');
+                });
+            });
+
+            // Acción del Botón "Concluir" (Visual por ahora)
+            document.querySelectorAll('.btn-concluir').forEach(boton => {
+                boton.addEventListener('click', (e) => {
+                    const fila = e.target.closest('tr');
+                    const numFilaSheet = fila.dataset.filaIndex;
+                    alert(`Botón Concluir presionado para la fila ${numFilaSheet}. Próximamente marcará 'Concluido' en el Sheet.`);
+                });
+            });
+        }
+
+        // Ejecutar la carga apenas abre la página
+        window.addEventListener('DOMContentLoaded', cargarDatosSheet);
+    </script>
+</body>
+</html>
