@@ -1,38 +1,32 @@
 console.log("Extensión 'Solicitud Ambulatorio' activa en: " + window.location.href);
 
 // ========================================================
-// CASO 1: Captura de datos en tu página de gestión (Local / Localhost)
+// CASO 1: Captura de datos en tu página de gestión (GitHub Pages / Local)
 // ========================================================
-if (window.location.href.includes("localhost") || window.location.protocol === "file:") {
+if (window.location.href.includes("facundo598.github.io") || window.location.href.includes("localhost") || window.location.protocol === "file:") {
     
-    const manejarGuardado = (datosFila) => {
-        const usuario = document.getElementById('ext-usuario').value;
-        const pass = document.getElementById('ext-password').value;
-        
-        // Guardamos TODO en el almacenamiento seguro de Chrome (Credenciales + Orden + Interruptor)
-        chrome.storage.local.set({ 
-            micam_user: usuario, 
-            micam_pass: pass,
-            micam_orden: datosFila,
-            solicitud_activa: true // <-- Esto le avisa a la extensión que SÍ debe redirigir
-        }, () => {
-            console.log("Datos y credenciales transferidos a la extensión.");
-        });
-    };
-
-    // Si hace clic en el botón superior fijo (solo logueo, no navega a ambulatorio)
+    // 1. Botón superior "Iniciar Logueo" manual (solo logueo, no navega a ambulatorio)
     const botonDisparar = document.getElementById('btn-iniciar-logueo');
     if (botonDisparar) {
         botonDisparar.addEventListener('click', () => {
             const usuario = document.getElementById('ext-usuario').value;
             const pass = document.getElementById('ext-password').value;
-            chrome.storage.local.set({ micam_user: usuario, micam_pass: pass, solicitud_activa: false });
+            
+            chrome.storage.local.set({ 
+                micam_user: usuario, 
+                micam_pass: pass, 
+                solicitud_activa: false 
+            }, () => {
+                window.open('https://micamsalud.com.ar/', '_blank');
+            });
         });
     }
 
-    // Si hace clic en "Copiar Datos" en la tabla
+    // 2. Botón "Copiar Datos" de la tabla
     document.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('btn-copiar')) {
+            e.preventDefault();
+            
             const fila = e.target.closest('tr');
             const datosFila = {
                 dni: fila.dataset.dni,
@@ -42,7 +36,20 @@ if (window.location.href.includes("localhost") || window.location.protocol === "
                 prestador: fila.dataset.prestador,
                 pago: fila.dataset.pago
             };
-            manejarGuardado(datosFila);
+            
+            const usuario = document.getElementById('ext-usuario').value;
+            const pass = document.getElementById('ext-password').value;
+            
+            // Guardamos TODO en el almacenamiento seguro de Chrome (Credenciales + Orden + Interruptor)
+            chrome.storage.local.set({ 
+                micam_user: usuario, 
+                micam_pass: pass,
+                micam_orden: datosFila,
+                solicitud_activa: true // <-- Esto le avisa a la extensión que SÍ debe redirigir
+            }, () => {
+                console.log("Datos y credenciales transferidos a la extensión. Abriendo Micam Salud...");
+                window.open('https://micamsalud.com.ar/', '_blank');
+            });
         }
     });
 }
@@ -59,6 +66,7 @@ if (window.location.href.includes("micamsalud.com.ar")) {
         // SUB-PASO A: LOGUEO AUTOMÁTICO (Solo si hay credenciales)
         // ----------------------------------------------------
         if (data.micam_user && data.micam_pass) {
+            
             const rellenarFormulario = setInterval(() => {
                 const campoUsuario = document.getElementById('user');
                 const campoClave = document.getElementById('pass');
@@ -69,17 +77,22 @@ if (window.location.href.includes("micamsalud.com.ar")) {
                     campoClave.value = data.micam_pass;
 
                     campoUsuario.dispatchEvent(new Event('input', { bubbles: true }));
+                    campoUsuario.dispatchEvent(new Event('change', { bubbles: true }));
                     campoClave.dispatchEvent(new Event('input', { bubbles: true }));
-
+                    campoClave.dispatchEvent(new Event('change', { bubbles: true }));
+                    
                     console.log("Logueando...");
                     botonIngresar.click();
                     
-                    // Borramos solo usuario/pass para que no intente loguearse de nuevo adentro
-                    chrome.storage.local.remove(['micam_user', 'micam_pass']);
+                    clearInterval(rellenarFormulario);
+                }
+                
+                if (!document.getElementById('user')) {
                     clearInterval(rellenarFormulario);
                 }
             }, 100);
-            setTimeout(() => clearInterval(rellenarFormulario), 5000);
+
+            setTimeout(() => clearInterval(rellenarFormulario), 10000);
         }
 
         // CONTROL DE FLUJO: Si NO viniste desde el botón "Copiar Datos", la extensión se detiene acá.
@@ -114,7 +127,7 @@ if (window.location.href.includes("micamsalud.com.ar")) {
                 setTimeout(() => { opcionCargarSolicitud.click(); }, 150); 
                 clearInterval(navegarMenu);
             }
-        }, 200);
+        }, 300);
 
         // ----------------------------------------------------
         // SUB-PASO C: SELECCIÓN DEL PRESTADOR Y FLUJO PASO A PASO
@@ -124,6 +137,7 @@ if (window.location.href.includes("micamsalud.com.ar")) {
 
             if (selectPrestador && data.micam_orden) {
                 const ordenActual = data.micam_orden;
+                clearInterval(seleccionarPrestador);
                 console.log("Insertando prestador desde la extensión:", ordenActual.prestador);
 
                 if (ordenActual.prestador.includes("CIRCULO MEDICO")) {
@@ -141,22 +155,25 @@ if (window.location.href.includes("micamsalud.com.ar")) {
                 
                 selectPrestador.dispatchEvent(new KeyboardEvent('keydown', { keyCode: 13, bubbles: true }));
                 selectPrestador.dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13, bubbles: true }));
-
-                clearInterval(seleccionarPrestador);
                 
                 // Disparamos el primer bloque: Cargar DNI
                 ejecutarPasoDni(ordenActual);
             }
-        }, 200);
+        }, 300);
 
         // === BLOQUE 1: FUNCION PARA CARGAR EL DNI ===
         function ejecutarPasoDni(ordenActual) {
             const bucleDni = setInterval(() => {
-                const inputDni = document.getElementById('txt_dni') || document.querySelector('input[name*="dni"]');
-                
+                const inputDni = document.getElementById('txt_dni');
                 if (inputDni && !inputDni.disabled) {
-                    console.log("Bloque DNI -> Escribiendo: " + ordenActual.dni);
-                    inputDni.value = ordenActual.dni;
+                    clearInterval(bucleDni);
+
+                    // CORRECCIÓN CLAVE: .trim() elimina los espacios en blanco invisibles del final
+                    const dniLimpio = ordenActual.dni.trim();
+                    console.log("Bloque DNI -> Escribiendo limpio: " + dniLimpio);
+                    
+                    inputDni.focus(); // Hacemos foco físico en el input
+                    inputDni.value = dniLimpio;
                     
                     inputDni.dispatchEvent(new Event('input', { bubbles: true }));
                     inputDni.dispatchEvent(new Event('change', { bubbles: true }));
@@ -166,26 +183,18 @@ if (window.location.href.includes("micamsalud.com.ar")) {
                     inputDni.dispatchEvent(new KeyboardEvent('keypress', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
                     inputDni.dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
                     
-                    clearInterval(bucleDni);
-
                     // Al terminar con éxito el DNI, llamamos al bloque de la matrícula dándole 1 segundo de espera
-                    setTimeout(() => {
-                        ejecutarPasoMatricula();
-                    }, 1000); 
+                    setTimeout(ejecutarPasoMatricula, 1000); 
                 }
-            }, 250);
-            
-            setTimeout(() => clearInterval(bucleDni), 8000); // Límite de seguridad para el DNI
+            }, 300);
         }
 
-        // === BLOQUE 2: FUNCION PARA CARGAR LA MATRÍCULA (Modificada al final) ===
+        // === BLOQUE 2: FUNCION PARA CARGAR LA MATRÍCULA ===
         function ejecutarPasoMatricula() {
             const inputMatricula = document.getElementById('txt_matricula');
-            
             if (inputMatricula) {
                 console.log("Bloque Matrícula -> Escribiendo valor fijo '01'");
                 inputMatricula.value = "01";
-                
                 inputMatricula.dispatchEvent(new Event('input', { bubbles: true }));
                 inputMatricula.dispatchEvent(new Event('change', { bubbles: true }));
                 
@@ -194,141 +203,70 @@ if (window.location.href.includes("micamsalud.com.ar")) {
                 inputMatricula.dispatchEvent(new KeyboardEvent('keypress', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
                 inputMatricula.dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
                 
-                // CAMBIO AQUÍ: En lugar de apagar el flujo, llamamos al paso de la fecha dando 1 segundo de espera
-                setTimeout(() => {
-                    ejecutarPasoFecha();
-                }, 1000);
-
-            } else {
-                console.error("Bloque Matrícula -> No se encontró el elemento #txt_matricula");
-                // Si falla la matrícula, apagamos el interruptor por seguridad
-                chrome.storage.local.set({ solicitud_activa: false });
+                // Llamamos al paso de la fecha dando 1 segundo de espera
+                setTimeout(ejecutarPasoFecha, 1000);
             }
         }
 
-        // === BLOQUE 3: FUNCION PARA CARGAR LA FECHA ACTUAL (Modificada al final) ===
+        // === BLOQUE 3: FUNCION PARA CARGAR LA FECHA ACTUAL ===
         function ejecutarPasoFecha() {
             const inputFecha = document.getElementById('txt_fecha_presc');
-
             if (inputFecha) {
                 const hoy = new Date();
-                const dia = String(hoy.getDate()).padStart(2, '0');
-                const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-                const anio = hoy.getFullYear();
-                
-                const fechaFormateada = `${dia}/${mes}/${anio}`;
+                const fechaFormateada = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
                 
                 console.log("Bloque Fecha -> Escribiendo fecha de hoy: " + fechaFormateada);
                 inputFecha.value = fechaFormateada;
-
                 inputFecha.dispatchEvent(new Event('input', { bubbles: true }));
                 inputFecha.dispatchEvent(new Event('change', { bubbles: true }));
-
-                console.log("Bloque Fecha -> Presionando ENTER");
                 inputFecha.dispatchEvent(new KeyboardEvent('keydown', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
-                inputFecha.dispatchEvent(new KeyboardEvent('keypress', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
-                inputFecha.dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
 
-                // CAMBIO AQUÍ: En lugar de apagar el flujo, llamamos a las observaciones dando 1 segundo de espera
-                setTimeout(() => {
-                    ejecutarPasoObservacion();
-                }, 1000);
-
-            } else {
-                console.error("Bloque Fecha -> No se encontró el elemento #txt_fecha_presc");
-                chrome.storage.local.set({ solicitud_activa: false });
+                // Llamamos a las observaciones dando 1 segundo de espera
+                setTimeout(ejecutarPasoObservacion, 1000);
             }
         }
 
-        // === BLOQUE 4: FUNCION PARA CARGAR LAS OBSERVACIONES (Modificada al final) ===
+        // === BLOQUE 4: FUNCION PARA CARGAR LAS OBSERVACIONES ===
         function ejecutarPasoObservacion() {
             const txtObservacion = document.getElementById('txt_observacion');
-
             if (txtObservacion) {
                 console.log("Bloque Observaciones -> Escribiendo: 'Orden de Consulta'");
                 txtObservacion.value = "Orden de Consulta";
-
                 txtObservacion.dispatchEvent(new Event('input', { bubbles: true }));
                 txtObservacion.dispatchEvent(new Event('change', { bubbles: true }));
                 
-                // CAMBIO AQUÍ: Llamamos al paso del código de práctica dando 1 segundo de espera
-                setTimeout(() => {
-                    ejecutarPasoCodigoPrac(data.micam_orden);
-                }, 1000);
-
-            } else {
-                console.error("Bloque Observaciones -> No se encontró el elemento #txt_observacion");
-                chrome.storage.local.set({ solicitud_activa: false });
+                // Llamamos al paso del código de práctica dando 1 segundo de espera
+                setTimeout(() => ejecutarPasoCodigoPrac(data.micam_orden), 1000);
             }
         }
 
         // === BLOQUE 5: CONVERSIÓN DE TEXTO A CÓDIGO NUMÉRICO Y CARGA ===
         function ejecutarPasoCodigoPrac(ordenActual) {
             const inputCodigo = document.getElementById('txt_cod_nomenclador');
-
-            if (inputCodigo && ordenActual && ordenActual.nombre) {
-                // 1. Limpiamos el nombre que viene del Sheet por si quedó algún espacio raro
-		const nombrePractica = ordenActual.orden.replace(/\s+/g, ' ').trim().toUpperCase();
+            if (inputCodigo && ordenActual?.orden) {
+                // Limpiamos el nombre que viene del Sheet por si quedó algún espacio raro
+                const nombrePractica = ordenActual.orden.replace(/\s+/g, ' ').trim().toUpperCase();
                 let codigoNumerico = "";
 
-                // 2. Regla de traducción (Diccionario de equivalencias)
-                switch (nombrePractica) {
-                    case "CONSULTA MEDICA":
-                        codigoNumerico = "420101";
-                        break;
-                    case "CONSULTA MEDICA ESPECIALISTA":
-                        codigoNumerico = "425009";
-                        break;
-                    case "CONSULTA POR GUARDIA":
-                        codigoNumerico = "420104";
-                        break;
-                    case "CONSULTA OFTALMOLOGICA ADULTO":
-                        codigoNumerico = "420304";
-                        break;
-                    default:
-                        console.warn("Bloque Código -> No se encontró coincidencia exacta para: " + nombrePractica);
-                        codigoNumerico = ""; // Podés dejarlo vacío o poner un código por defecto si querés
-                }
+                // Regla de traducción (Diccionario de equivalencias)
+                if (nombrePractica === "CONSULTA MEDICA") codigoNumerico = "420101";
+                else if (nombrePractica === "CONSULTA MEDICA ESPECIALISTA") codigoNumerico = "425009";
+                else if (nombrePractica === "CONSULTA POR GUARDIA") codigoNumerico = "420104";
+                else if (nombrePractica === "CONSULTA OFTALMOLOGICA ADULTO") codigoNumerico = "420304";
 
-                if (codigoNumerico !== "") {
+                if (codigoNumerico) {
                     console.log(`Bloque Código -> Matcheó '${nombrePractica}' con el número: ${codigoNumerico}`);
                     inputCodigo.value = codigoNumerico;
-
-                    // Disparamos eventos de cambio para el input
                     inputCodigo.dispatchEvent(new Event('input', { bubbles: true }));
                     inputCodigo.dispatchEvent(new Event('change', { bubbles: true }));
-
-                    // Simulamos el ENTER obligatorio para activar el buscador interno de la web
+                    
                     console.log("Bloque Código -> Presionando ENTER");
                     inputCodigo.dispatchEvent(new KeyboardEvent('keydown', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
-                    inputCodigo.dispatchEvent(new KeyboardEvent('keypress', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
-                    inputCodigo.dispatchEvent(new KeyboardEvent('keyup', { keyCode: 13, key: 'Enter', code: 'Enter', bubbles: true }));
                 }
-
-            } else {
-                console.error("Bloque Código -> No se encontró el elemento #txt_cod_nomenclador o faltan datos de la orden.");
             }
-
-
-
-
-
-
-
-
-
-
-            // Finalizado todo el recorrido hasta la fecha, ahora sí apagamos el interruptor general
+            // Finalizado todo el recorrido, apagamos el interruptor general
             chrome.storage.local.set({ solicitud_activa: false });
-            console.log("Flujo automatizado completo hasta la Fecha. Extensión liberada.");
+            console.log("Flujo automatizado completo. Extensión liberada.");
         }
-
-        // Limpieza general de intervalos colgados
-        setTimeout(() => {
-            clearInterval(navegarMenu);
-            clearInterval(seleccionarPrestador);
-        }, 15000);
-
-
     });
 }
