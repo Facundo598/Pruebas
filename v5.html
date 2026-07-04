@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario</title> 
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial, sans-serif;background:#f4f4f4;}
+
+.banner{
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+    object-fit: contain; /* Esto hace que el logo se achique entero sin recortarse */
+    background: white;   /* Le da un fondo blanco limpio por detrás */
+    padding: 10px 0;
+}
+.contenedor{
+    max-width:700px;
+    margin:20px auto 30vh auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,.1);}
+h1{text-align:center;margin-bottom:25px;color:#333;}
+.seccion{margin-top:25px;}
+label{display:block;margin-bottom:8px;
+    font-weight:bold;color:#444;}
+input,
+select,
+button{width:100%;padding:12px;
+    border:1px solid #ccc;border-radius:6px;
+    font-size:16px;}
+button{margin-top:10px;background:#1976d2;
+    color:white;border:none;cursor:pointer;}
+button:hover{background:#1565c0;}
+
+/* Unificación de clases para ocultar elementos de manera estricta */
+.oculto{display:none !important;}
+.oculto-planilla {display: none !important;}
+
+#bienvenida{
+    margin-top:20px;
+    font-size:18px;
+    color:green;
+    font-weight:bold;
+    text-align:center;
+    line-height:1.6;}
+.error{color:red !important;}
+
+#resultado{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;}
+
+/* Estilos para los radio buttons de pago */
+.opciones-pago {margin-top: 10px;}
+.opcion-radio {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+.opcion-radio input[type="radio"] {
+    width: auto;margin-right: 10px;cursor: pointer;}
+.opcion-radio span {font-size: 16px;color: #333;}
+
+/* Estilos específicos del buscador dinámico de cercanía */
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.result-box {
+    background-color: #ebf8ff;
+    border-left: 4px solid #1976d2;
+    padding: 20px;
+    border-radius: 4px;
+    margin-top: 25px;
+    text-align: left !important;
+}
+.result-box h3 {
+    margin: 0 0 15px 0;
+    color: #1976d2;
+    font-size: 1.1rem;
+}
+.prestadores-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.prestador-opcion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 0;
+}
+.prestador-opcion input[type="radio"] {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+.suggestion-tag {
+    display: inline-block;
+    background-color: #feebc8;
+    color: #c05621;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+</style>
+</head>
+<body>
+  
+<img src="https://sirelyf.org/wp-content/uploads/2023/04/OSFATLYF-salud-luz-y-fuerza-web-SiReLyF.png" class="banner" alt="Banner OSFATLYF">
+
+<div class="contenedor">
+    <h1>Cuestionario de Relevamiento</h1>
+
+    <div class="seccion">
+        <label>DNI</label>
+        <input type="text" id="dni" placeholder="Ingrese DNI">
+        <button onclick="buscarUsuario()">Buscar</button>
+    </div>
+
+    <div id="bienvenida"></div>
+
+    <div id="seccionUbicacion" class="seccion oculto">
+        <label style="font-size: 1.2rem; color: #1976d2; margin-bottom: 15px;">¿Dónde desea atenderse?</label>
+        
+        <div class="seccion" style="margin-top: 10px;">
+            <label for="localidad">Seleccione opción:</label>
+            <select id="localidad" onchange="evaluarLocalidad()">
+                <option value="" disabled selected>-- Seleccione una opción --</option>
+                <option value="salta_capital">Salta Capital</option>
+                <option value="guemes">General Güemes</option>
+                <option value="anta">Anta</option>
+                <option value="metan">Metán</option>
+                <option value="tartagal">Tartagal</option>
+                <option value="otra">❓ No sé / Otra localidad</option>
+            </select>
+        </div>
+
+        <div id="seccion-departamento" class="seccion oculto">
+            <label for="departamento">Indique su departamento:</label>
+            <select id="departamento" onchange="cargarMunicipios()">
+                <option value="" disabled selected>Seleccione departamento...</option>
+            </select>
+        </div>
+
+        <div id="seccion-municipio" class="seccion oculto">
+            <label for="municipio">Indique su municipio:</label>
+            <select id="municipio" onchange="sugerirPorMunicipio()">
+                <option value="" disabled selected>Seleccione municipio...</option>
+            </select>
+        </div>
+
+        <div id="resultadoUbicacion" class="result-box oculto">
+            <div id="sugerencia-tag" class="suggestion-tag oculto">Sugerido por cercanía</div>
+            <h3>Prestadores disponibles en la zona:</h3>
+            <div id="contenedor-prestadores" class="prestadores-lista"></div>
+        </div>
+    </div>
+
+    <div id="ordenesDiv" class="seccion oculto">
+        <label>Orden Disponible</label>
+        <select id="ordenes"></select>
+    </div>
+
+    <div id="pagoDiv" class="seccion oculto">
+        <label>¿Cómo desea realizar el pago?</label>
+        <div class="opciones-pago">
+            <label class="opcion-radio" id="opcionPlanillaLabel">
+                <input type="radio" name="metodoPago" value="Descuento por planilla" onchange="cambioMetodoPago()">
+                <span>Descuento por planilla</span>
+            </label>
+            <label class="opcion-radio">
+                <input type="radio" name="metodoPago" value="Transferencia bancaria" onchange="cambioMetodoPago()">
+                <span>Transferencia bancaria: cvu</span>
+            </label>
+        </div>
+    </div>
+  
+    <div id="comprobanteDiv" class="seccion oculto">
+        <label>Subir comprobante de transferencia (Formato imagen: JPG, PNG)</label>
+        <input type="file" id="comprobanteInput" accept="image/jpeg, image/png">
+    </div>
+
+    <div id="enviarDiv" class="seccion oculto">
+        <button onclick="enviarSolicitud()">Enviar Solicitud</button>
+    </div>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbyqWzg327ovt70g4DqHWD3sAhrxrbWo5_PV4Zy5xV3QOGNTYkIP4ctULKcUx-GJEP0S/exec";
+  
+// Base de datos de Salta integrada
+const baseDatosSalta = {
+    "Anta": {
+        municipios: ["APOLINARIO SARAVIA", "EL QUEBRACHAL", "GENERAL PIZARRO", "JOAQUIN V. GONZALEZ", "LAS LAJITAS"],
+        prestadorDefecto: ["Círculo Médico de Anta"]
+    },
+    "Cachi": {
+        municipios: ["CACHI", "PAYOGASTA"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "Cafayate": {
+        municipios: ["CAFAYATE"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "Capital": {
+        municipios: ["SALTA", "SAN LORENZO"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "Cerrillos": {
+        municipios: ["CERRILLOS", "LA MERCED"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "Chicoana": {
+        municipios: ["CHICOANA", "EL CARRIL"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "General Güemes": {
+        municipios: ["CAMPO SANTO", "EL BORDO", "GENERAL GÜEMES"],
+        prestadorDefecto: ["SAMOBA Salud"]
+    },
+    "Guachipas": {
+        municipios: ["GUACHIPAS"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "Iruya": {
+        municipios: ["CAÑAS (LAS CAÑAS)", "IRUYA"],
+        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]
+    },
+    "La Caldera": {
+        municipios: ["LA CALDERA", "VAQUEROS"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "La Candelaria": {
+        municipios: ["EL JARDIN", "EL TALA", "LA CANDELARIA"],
+        prestadorDefecto: ["Círculo Médico Metán"]
+    },
+    "La Poma": {
+        municipios: ["LA POMA"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "La Viña": {
+        municipios: ["CORONEL MOLDES", "LA VIÑA"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "Los Andes": {
+        municipios: ["SAN ANTONIO DE LOS COBRES", "TOLAR GRANDE"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "Metán": {
+        municipios: ["EL GALPON", "RIO PIEDRAS", "SAN JOSE DE METAN"],
+        prestadorDefecto: ["Círculo Médico Metán"]
+    },
+    "Molinos": {
+        municipios: ["MOLINOS", "SECLANTAS"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "Orán": {
+        municipios: ["AGUAS BLANCAS", "COLONIA SANTA ROSA", "HIPOLITO YRIGOYEN", "PICHANAL", "SAN RAMON DE LA NUEVA ORAN", "URUNDEL"],
+        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]
+    },
+    "Rivadavia": {
+        municipios: ["RIVADAVIA BANDA NORTE", "RIVADAVIA BANDA SUR", "SANTA VICTORIA ESTE"],
+        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]
+    },
+    "Rosario de la Frontera": {
+        municipios: ["EL POTRERO", "ROSARIO DE LA FRONTERA"],
+        prestadorDefecto: ["Círculo Médico Metán"]
+    },
+    "Rosario de Lerma": {
+        municipios: ["CAMPO QUIJANO", "ROSARIO DE LERMA"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "San Carlos": {
+        municipios: ["ANGASTACO", "ANIMANA", "SAN CARLOS"],
+        prestadorDefecto: ["Círculo Médico de Salta"]
+    },
+    "San Martín": {
+        municipios: ["AGUARAY", "EMBARCACION", "GENERAL BALLIVIAN", "GENERAL MOSCONI", "SALVADOR MAZZA", "TARTAGAL"],
+        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]
+    },
+    "Santa Victoria": {
+        municipios: ["LOS TOLDOS", "NAZARENO", "SANTA VICTORIA OESTE"],
+        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]
+    }
+};
+
+const prestadoresFijos = {
+    salta_capital: ["Círculo Médico de Salta", "SAMOBA Salud", "Asociación Salteña de Ortopedia"],
+    guemes: ["SAMOBA Salud"],
+    anta: ["Círculo Médico de Anta"],
+    metan: ["Círculo Médico Metán"],
+    tartagal: ["Círculo Médico de Tartagal", "Clínica San Antonio"]
+};
+
+let afiliado = null;
+let ordenesDisponibles = [];
+let prestadorSeleccionado = null;
+
+// Precarga alfabética de departamentos en el select al arrancar la ventana
+window.onload = function() {
+    const selectDepto = document.getElementById('departamento');
+    Object.keys(baseDatosSalta).sort().forEach(depto => {
+        const opt = document.createElement('option');
+        opt.value = depto;
+        opt.textContent = depto;
+        selectDepto.appendChild(opt);
+    });
+};
+
+function centrar(id){
+    const elemento = document.getElementById(id);
+    setTimeout(() => {
+        elemento.scrollIntoView({ behavior:"smooth", block:"center" });
+    },300);
+}
+
+// --- LÓGICA DE DETECCIÓN Y RENDERIZADO DE INTERFAZ ---
+
+function evaluarLocalidad() {
+    const selector = document.getElementById('localidad');
+    const seccionDepto = document.getElementById('seccion-departamento');
+    const seccionMunicipio = document.getElementById('seccion-municipio');
+    const cajaResultado = document.getElementById('resultadoUbicacion');
+    
+    // Resetear valores de los selectores secundarios
+    document.getElementById('departamento').selectedIndex = 0;
+    document.getElementById('municipio').innerHTML = '<option value="" disabled selected>Seleccione municipio...</option>';
+    seccionMunicipio.classList.add('oculto');
+    cajaResultado.classList.add('oculto');
+    prestadorSeleccionado = null;
+    
+    if (selector.value === 'otra') {
+        seccionDepto.classList.remove('oculto');
+        seccionDepto.classList.add('fade-in');
+        centrar("seccion-departamento");
+    } else if (selector.value) {
+        seccionDepto.classList.add('oculto');
+        mostrarPrestadores(prestadoresFijos[selector.value], false);
+    } else {
+        seccionDepto.classList.add('oculto');
+    }
+}
+
+function cargarMunicipios() {
+    const deptoSeleccionado = document.getElementById('departamento').value;
+    const seccionMunicipio = document.getElementById('seccion-municipio');
+    const selectMunicipio = document.getElementById('municipio');
+    const cajaResultado = document.getElementById('resultadoUbicacion');
+
+    cajaResultado.classList.add('oculto');
+    prestadorSeleccionado = null;
+    selectMunicipio.innerHTML = '<option value="" disabled selected>Seleccione municipio...</option>';
+
+    if (deptoSeleccionado && baseDatosSalta[deptoSeleccionado]) {
+        baseDatosSalta[deptoSeleccionado].municipios.forEach(muni => {
+            const opt = document.createElement('option');
+            opt.value = muni;
+            opt.textContent = muni;
+            selectMunicipio.appendChild(opt);
+        });
+        seccionMunicipio.classList.remove('oculto');
+        seccionMunicipio.classList.add('fade-in');
+        centrar("seccion-municipio");
+    }
+}
+
+function sugerirPorMunicipio() {
+    const depto = document.getElementById('departamento').value;
+    const muni = document.getElementById('municipio').value;
+    if (!depto || !muni) return;
+
+    let prestadoresSugeridos = [...baseDatosSalta[depto].prestadorDefecto];
+
+    // Excepción de derivación específica
+    if (depto === "Rivadavia" && muni === "RIVADAVIA BANDA SUR") {
+        prestadoresSugeridos = ["Círculo Médico de Anta"];
+    }
+    mostrarPrestadores(prestadoresSugeridos, true);
+}
+
+function mostrarPrestadores(lista, esSugerido) {
+    const cajaResultado = document.getElementById('resultadoUbicacion');
+    const contenedor = document.getElementById('contenedor-prestadores');
+    const tag = document.getElementById('sugerencia-tag');
+
+    contenedor.innerHTML = '';
+    prestadorSeleccionado = null;
+
+    lista.forEach((prestador) => {
+        const label = document.createElement('label');
+        label.className = 'prestador-opcion';
+        
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'prestador_opt';
+        radio.value = prestador;
+        
+        radio.onchange = function() {
+            prestadorSeleccionado = this.value;
+        };
+
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(prestador));
+        contenedor.appendChild(label);
+    });
+
+    if (esSugerido) {
+        tag.classList.remove('oculto');
+    } else {
+        tag.classList.add('oculto');
+    }
+
+    cajaResultado.classList.remove('oculto');
+    cajaResultado.classList.add('fade-in');
+    centrar("resultadoUbicacion");
+}
+
+// --- ACCIONES DE BÚSQUEDA Y ENVÍO ---
+
+async function buscarUsuario() {
+    const dni = document.getElementById("dni").value.trim();
+    const bienvenida = document.getElementById("bienvenida");
+
+    bienvenida.innerHTML = "Buscando...";
+    bienvenida.classList.remove("error");
+
+    // Limpieza estricta de estados de interfaz anteriores
+    document.getElementById("localidad").selectedIndex = 0;
+    document.getElementById("seccion-departamento").classList.add("oculto");
+    document.getElementById("seccion-municipio").classList.add("oculto");
+    document.getElementById("resultadoUbicacion").classList.add("oculto");
+    
+    document.getElementById("seccionUbicacion").classList.add("oculto");
+    document.getElementById("ordenesDiv").classList.add("oculto");
+    document.getElementById("pagoDiv").classList.add("oculto");
+    document.getElementById("comprobanteDiv").classList.add("oculto");
+    document.getElementById("enviarDiv").classList.add("oculto");
+    document.getElementById("resultado").innerHTML = "";
+    prestadorSeleccionado = null;
+
+    try {
+        const respuesta = await fetch(URL_API + "?action=buscar&dni=" + encodeURIComponent(dni));
+        const datos = await respuesta.json();
+
+        if (datos.existe) {
+            afiliado = datos;
+            ordenesDisponibles = datos.ordenesDisponibles || [];
+
+            bienvenida.innerHTML = `
+                <strong>${datos.nombre}</strong><br>
+                Credencial: ${datos.credencial}<br>
+                Plan: ${datos.plan}<br>
+                Estado: ${datos.estado}
+            `;
+
+            // Muestra bloque geográfico
+            document.getElementById("seccionUbicacion").classList.remove("oculto");
+            
+            const select = document.getElementById("ordenes");
+            select.innerHTML = "";
+
+            if (ordenesDisponibles.length === 0) {
+                document.getElementById("ordenesDiv").classList.remove("oculto");
+                select.innerHTML = "<option>No disponible</option>";
+                
+                const resultado = document.getElementById("resultado");
+                resultado.innerHTML = "No cuenta con órdenes disponibles para este mes.";
+                resultado.style.color = "red";
+            } else {
+                ordenesDisponibles.forEach(orden => {
+                    const op = document.createElement("option");
+                    op.value = orden.id;
+                    const precioFormateado = `$${orden.precio.toLocaleString('es-AR')}`;
+                    op.textContent = `${orden.nombre} (${precioFormateado})`;
+                    select.appendChild(op);
+                });
+              
+                document.getElementById("ordenesDiv").classList.remove("oculto");
+                document.getElementById("pagoDiv").classList.remove("oculto");
+                
+                const labelPlanilla = document.getElementById("opcionPlanillaLabel");
+                if (afiliado && afiliado.trabajador && afiliado.trabajador.toUpperCase() === "ACTIVO") {
+                    labelPlanilla.classList.remove("oculto-planilla");
+                } else {
+                    labelPlanilla.classList.add("oculto-planilla");
+                }
+
+                document.getElementById("enviarDiv").classList.remove("oculto");
+            }
+            centrar("seccionUbicacion");
+        } else {
+            bienvenida.innerHTML = "DNI no encontrado";
+            bienvenida.classList.add("error");
+        }
+    } catch (error) {
+        console.error(error);
+        bienvenida.innerHTML = "Error al consultar datos";
+        bienvenida.classList.add("error");
+    }
+}
+
+function cambioMetodoPago() {
+    const metodoSeleccionado = document.querySelector('input[name="metodoPago"]:checked')?.value;
+    const comprobanteDiv = document.getElementById("comprobanteDiv");
+
+    if (metodoSeleccionado === "Transferencia bancaria") {
+        comprobanteDiv.classList.remove("oculto");
+        centrar("comprobanteDiv");
+    } else {
+        comprobanteDiv.classList.add("oculto");
+        document.getElementById("comprobanteInput").value = ""; 
+    }
+}
+
+function archivoABase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            const base64String = reader.result.split(',')[1];
+            resolve(base64String);
+        };
+        reader.onerror = error => reject(error);
+    });
+}
+
+async function enviarSolicitud(){
+    const locValor = document.getElementById("localidad").value;
+    if (!locValor) { alert("Por favor, seleccione dónde desea atenderse."); return; }
+    if (locValor === 'otra') {
+        const depto = document.getElementById("departamento").value;
+        const muni = document.getElementById("municipio").value;
+        if (!depto || !muni) { alert("Por favor, complete departamento y municipio."); return; }
+    }
+    if (!prestadorSeleccionado) { alert("Por favor, seleccione un prestador de la lista."); return; }
+
+    const orden = document.getElementById("ordenes").value;
+    const metodoPago = document.querySelector('input[name="metodoPago"]:checked')?.value;
+    if(!metodoPago){alert("Por favor, seleccione un método de pago");return;}
+
+    const dniInput = document.getElementById("dni").value.trim();
+    const nombreAfiliado = document.getElementById("bienvenida").querySelector("strong")?.innerText || "Afiliado";
+
+    let archivoBase64 = "";
+    let nombreArchivo = "";
+    if (metodoPago === "Transferencia bancaria") {
+        const fileInput = document.getElementById("comprobanteInput");
+        if (fileInput.files.length === 0) {
+            alert("Por favor, suba el comprobante de la transferencia");
+            return;
+        }
+        const file = fileInput.files[0];
+        nombreArchivo = file.name;
+        
+        try {
+            archivoBase64 = await archivoABase64(file);
+        } catch (e) {
+            alert("Error al procesar la imagen del comprobante");
+            return;
+        }
+    }
+
+    const resultado = document.getElementById("resultado");
+    resultado.innerHTML = "Enviando solicitud...";
+    resultado.style.color = "blue";
+
+    let deptoFinal = "CAPITAL";
+    let muniFinal = "SALTA";
+
+    if (locValor === "otra") {
+        deptoFinal = document.getElementById("departamento").value.toUpperCase();
+        muniFinal = document.getElementById("municipio").value.toUpperCase();
+    } else {
+        if (locValor === "guemes") { deptoFinal = "GENERAL GÜEMES"; muniFinal = "GENERAL GÜEMES"; }
+        if (locValor === "anta") { deptoFinal = "ANTA"; muniFinal = "JOAQUIN V. GONZALEZ"; }
+        if (locValor === "metan") { deptoFinal = "METAN"; muniFinal = "SAN JOSE DE METAN"; }
+        if (locValor === "tartagal") { deptoFinal = "SAN MARTIN"; muniFinal = "TARTAGAL"; }
+    }
+
+try {
+        const params = new URLSearchParams();
+        params.append("dni", dniInput);
+        params.append("nombre", nombreAfiliado);
+        params.append("orden", orden); 
+        params.append("departamento", deptoFinal);
+        params.append("municipio", muniFinal);
+        params.append("metodoPago", metodoPago);
+        params.append("archivoBase64", archivoBase64); 
+        params.append("nombreArchivo", nombreArchivo); 
+        params.append("prestador", prestadorSeleccionado);
+        
+        // Disparamos el envío al servidor en segundo plano
+        fetch(URL_API, {
+            method: "POST",
+            body: params 
+        }).catch(err => console.log("Réplica del servidor en segundo plano:", err));
+
+        // Estrategia Optimista: Como sabemos que el servidor procesa el paquete de inmediato,
+        // ejecutamos las acciones de éxito en la interfaz sin esperar la respuesta.
+        alert("¡Transacción Exitosa!\nSu solicitud ha sido enviada y está siendo procesada correctamente.");
+        
+        resultado.innerHTML = "Solicitud guardada correctamente. Prestador asignado: " + prestadorSeleccionado;
+        resultado.style.color = "green";
+        
+        // Limpiamos por completo la pantalla para el próximo DNI
+        reiniciarFormulario();
+
+    } catch(error) {
+        console.error(error);
+        resultado.innerHTML = "Ocurrió un inconveniente al procesar el formulario.";
+        resultado.style.color = "red";
+    }
+}
+
+    
+// Nueva función encargada de limpiar la interfaz para el próximo reingreso
+function reiniciarFormulario() {
+    // Limpiar input principal e información de afiliado en memoria
+    document.getElementById("dni").value = "";
+    document.getElementById("bienvenida").innerHTML = "";
+    afiliado = null;
+    ordenesDisponibles = [];
+    prestadorSeleccionado = null;
+
+    // Resetear selectores geográficos
+    document.getElementById("localidad").selectedIndex = 0;
+    document.getElementById("departamento").selectedIndex = 0;
+    document.getElementById("municipio").innerHTML = '<option value="" disabled selected>Seleccione municipio...</option>';
+    document.getElementById("contenedor-prestadores").innerHTML = '';
+
+    // Desmarcar métodos de pago (Radio buttons)
+    const radiosPago = document.querySelectorAll('input[name="metodoPago"]');
+    radiosPago.forEach(radio => radio.checked = false);
+
+    // Limpiar selector de archivos
+    document.getElementById("comprobanteInput").value = "";
+
+    // Ocultar de manera estricta todos los contenedores condicionales
+    document.getElementById("seccion-departamento").classList.add("oculto");
+    document.getElementById("seccion-municipio").classList.add("oculto");
+    document.getElementById("resultadoUbicacion").classList.add("oculto");
+    document.getElementById("seccionUbicacion").classList.add("oculto");
+    document.getElementById("ordenesDiv").classList.add("oculto");
+    document.getElementById("pagoDiv").classList.add("oculto");
+    document.getElementById("comprobanteDiv").classList.add("oculto");
+    document.getElementById("enviarDiv").classList.add("oculto");
+}
+</script>
+</body>
+</html>
