@@ -3,27 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cuestionario</title> 
+<title>Orden Consulta</title> 
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:Arial, sans-serif;background:#f4f4f4;}
 
 .banner{
-    width: 100%;
-    height: auto;
+    width: 100%; height: auto;
     max-height: 250px;
     object-fit: contain; /* Esto hace que el logo se achique entero sin recortarse */
     background: white;   /* Le da un fondo blanco limpio por detrás */
-    padding: 10px 0;
-}
+    padding: 10px 0;}
 .contenedor{
-    width: 90%;
-    max-width:900px;
-    margin:20px auto 10vh auto;
-    background:white;
-    padding:25px;
-    border-radius:12px;
+    width: 90%; max-width:900px;
+    margin:20px auto 10vh auto; background:white;
+    padding:25px; border-radius:12px;
     box-shadow:0 0 15px rgba(0,0,0,.1);}
 h1{text-align:center;margin-bottom:25px;color:#333;}
 .seccion{margin-top:25px;}
@@ -67,69 +62,35 @@ button:hover{background:#1565c0;}
 /* Estilos para los radio buttons de pago */
 .opciones-pago {margin-top: 10px;}
 .opcion-radio {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-.opcion-radio input[type="radio"] {
-    width: auto;margin-right: 10px;cursor: pointer;}
+    display: flex;align-items: center;
+    margin-bottom: 10px;cursor: pointer;}
+.opcion-radio input[type="radio"] {width: auto;margin-right: 10px;cursor: pointer;}
 .opcion-radio span {font-size: 16px;color: #333;}
 
 /* Estilos específicos del buscador dinámico de cercanía */
-.fade-in {
-    animation: fadeIn 0.3s ease-out;
-}
+.fade-in {animation: fadeIn 0.3s ease-out;}
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
 }
 .result-box {
-    background-color: #ebf8ff;
-    border-left: 4px solid #1976d2;
-    padding: 20px;
-    border-radius: 4px;
-    margin-top: 25px;
-    text-align: left !important;
-}
-.result-box h3 {
-    margin: 0 0 15px 0;
-    color: #1976d2;
-    font-size: 1.1rem;
-}
-.prestadores-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
-}
+    background-color: #ebf8ff; border-left: 4px solid #1976d2;
+    padding: 20px; border-radius: 4px;
+    margin-top: 25px; text-align: left !important;}
+.result-box h3 {margin: 0 0 15px 0;color: #1976d2;font-size: 1.1rem;}
+.prestadores-lista {display: flex;flex-direction: column;gap: 12px;margin-bottom: 20px;}
 .prestador-opcion {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 4px 0;
-}
+    display: flex;align-items: center;gap: 10px;font-size: 1rem;
+    font-weight: 500;cursor: pointer;padding: 4px 0;}
 .prestador-opcion input[type="radio"] {
-    margin: 0;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
+    margin: 0;width: 18px;height: 18px;cursor: pointer;}
 .suggestion-tag {
-    display: inline-block;
-    background-color: #feebc8;
-    color: #c05621;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
+    display: inline-block; background-color: #feebc8;
+    color: #c05621; padding: 2px 8px;
+    border-radius: 4px; font-size: 0.85rem;
+    font-weight: bold; margin-bottom: 15px;}
   
-/* Estilos nuevos para el cartel de éxito */
+/* Estilos nuevos para el cartel de envio con éxito */
 #mensaje-exito { text-align: center; border: 2px solid #4CAF50; padding: 30px; border-radius: 8px; margin-top: 20px; }
 .icono-exito { font-size: 60px; color: #4CAF50; margin-bottom: 15px; }
 .texto-exito { font-size: 18px; color: #333; line-height: 1.5; margin-bottom: 25px; }
@@ -138,8 +99,6 @@ button:hover{background:#1565c0;}
   
 </style>
 </head>
-<body>
-  
 <body>
   
 <img src="https://sirelyf.org/wp-content/uploads/2023/04/OSFATLYF-salud-luz-y-fuerza-web-SiReLyF.png" class="banner" alt="Banner OSFATLYF">
@@ -172,7 +131,7 @@ button:hover{background:#1565c0;}
             <label for="localidad">Seleccione opción:</label>
             <select id="localidad" onchange="evaluarLocalidad()">
                 <option value="" disabled selected>-- Seleccione una opción --</option>
-                <option value="salta_capital">Salta Capital</option>
+                <option value="capital">Salta Capital</option>
                 <option value="guemes">General Güemes</option>
                 <option value="anta">Anta</option>
                 <option value="metan">Metán</option>
@@ -241,94 +200,113 @@ button:hover{background:#1565c0;}
 </div>
 
 <script>
-// El bloque de <script> se mantiene exactamente igual a como lo tenías.
-// Recuerda aplicar en 'buscarUsuario()' la línea: msgBusqueda.style.display = "none";
-</script>
-</body>
-
-<script>
 const URL_API = "https://script.google.com/macros/s/AKfycbyqWzg327ovt70g4DqHWD3sAhrxrbWo5_PV4Zy5xV3QOGNTYkIP4ctULKcUx-GJEP0S/exec";
   
 // Base de datos de Salta integrada
 const baseDatosSalta = {
     "Anta": {
         municipios: ["APOLINARIO SARAVIA", "EL QUEBRACHAL", "GENERAL PIZARRO", "JOAQUIN V. GONZALEZ", "LAS LAJITAS"],
-        prestadorDefecto: ["Círculo Médico de Anta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE ANTA"]
+    },
     "Cachi": {
         municipios: ["CACHI", "PAYOGASTA"],
-      	prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "Cafayate": {
         municipios: ["CAFAYATE"],
-      	prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "Capital": {
         municipios: ["SALTA", "SAN LORENZO"],
-      	prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA", "SAMOBA SALUD SA", "Asociación Salteña de Ortopedia y Traumatología"]
+    },
     "Cerrillos": {
         municipios: ["CERRILLOS", "LA MERCED"],
-      	prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "Chicoana": {
         municipios: ["CHICOANA", "EL CARRIL"],
-      prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "General Güemes": {
         municipios: ["CAMPO SANTO", "EL BORDO", "GENERAL GÜEMES"],
-        prestadorDefecto: ["SAMOBA Salud"]},
+        prestadorDefecto: ["SAMOBA SALUD SA"]
+    },
     "Guachipas": {
         municipios: ["GUACHIPAS"],
-        prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "Iruya": {
         municipios: ["CAÑAS (LAS CAÑAS)", "IRUYA"],
-        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE TARTAGAL", "CLINICA SAN ANTONIO"]
+    },
     "La Caldera": {
         municipios: ["LA CALDERA", "VAQUEROS"],
-        prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "La Candelaria": {
         municipios: ["EL JARDIN", "EL TALA", "LA CANDELARIA"],
-        prestadorDefecto: ["Círculo Médico Metán"]},
+        prestadorDefecto: ["CIRCULO MEDICO METAN"]
+    },
     "La Poma": {
         municipios: ["LA POMA"],
-        prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "La Viña": {
         municipios: ["CORONEL MOLDES", "LA VIÑA"],
-        prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "Los Andes": {
         municipios: ["SAN ANTONIO DE LOS COBRES", "TOLAR GRANDE"],
-        prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "Metán": {
         municipios: ["EL GALPON", "RIO PIEDRAS", "SAN JOSE DE METAN"],
-        prestadorDefecto: ["Círculo Médico Metán"]},
+        prestadorDefecto: ["CIRCULO MEDICO METAN"]
+    },
     "Molinos": {
         municipios: ["MOLINOS", "SECLANTAS"],
-        prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "Orán": {
         municipios: ["AGUAS BLANCAS", "COLONIA SANTA ROSA", "HIPOLITO YRIGOYEN", "PICHANAL", "SAN RAMON DE LA NUEVA ORAN", "URUNDEL"],
-        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE TARTAGAL", "CLINICA SAN ANTONIO"]
+    },
     "Rivadavia": {
         municipios: ["RIVADAVIA BANDA NORTE", "RIVADAVIA BANDA SUR", "SANTA VICTORIA ESTE"],
-        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE TARTAGAL", "CLINICA SAN ANTONIO"]
+    },
     "Rosario de la Frontera": {
         municipios: ["EL POTRERO", "ROSARIO DE LA FRONTERA"],
-        prestadorDefecto: ["Círculo Médico Metán"]},
+        prestadorDefecto: ["CIRCULO MEDICO METAN"]
+    },
     "Rosario de Lerma": {
         municipios: ["CAMPO QUIJANO", "ROSARIO DE LERMA"],
-        prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "San Carlos": {
         municipios: ["ANGASTACO", "ANIMANA", "SAN CARLOS"],
-        prestadorDefecto: ["Círculo Médico de Salta"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE SALTA"]
+    },
     "San Martín": {
         municipios: ["AGUARAY", "EMBARCACION", "GENERAL BALLIVIAN", "GENERAL MOSCONI", "SALVADOR MAZZA", "TARTAGAL"],
-        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]},
+        prestadorDefecto: ["CIRCULO MEDICO DE TARTAGAL", "CLINICA SAN ANTONIO"]
+    },
     "Santa Victoria": {
         municipios: ["LOS TOLDOS", "NAZARENO", "SANTA VICTORIA OESTE"],
-        prestadorDefecto: ["Círculo Médico de Tartagal", "Clínica San Antonio"]}
+        prestadorDefecto: ["CIRCULO MEDICO DE TARTAGAL", "CLINICA SAN ANTONIO"]
+    }
 };
 
 const prestadoresFijos = {
-    salta_capital: ["Círculo Médico de Salta", "SAMOBA Salud", "Asociación Salteña de Ortopedia"],
-    guemes: ["SAMOBA Salud"],
-    anta: ["Círculo Médico de Anta"],
-    metan: ["Círculo Médico Metán"],
-    tartagal: ["Círculo Médico de Tartagal", "Clínica San Antonio"]
+    capital: ["CIRCULO MEDICO DE SALTA", "SAMOBA SALUD SA", "Asociación Salteña de Ortopedia y Traumatología"],
+    guemes: ["SAMOBA SALUD SA"],
+    anta: ["CIRCULO MEDICO DE ANTA"],
+    metan: ["CIRCULO MEDICO METAN"],
+    tartagal: ["CIRCULO MEDICO DE TARTAGAL", "CLINICA SAN ANTONIO"]
 };
+
+
 
 let afiliado = null;
 let ordenesDisponibles = [];
@@ -423,35 +401,26 @@ function mostrarPrestadores(lista, esSugerido) {
 
     contenedor.innerHTML = '';
     prestadorSeleccionado = null;
-
     lista.forEach((prestador) => {
         const label = document.createElement('label');
         label.className = 'prestador-opcion';
-        
         const radio = document.createElement('input');
         radio.type = 'radio';
         radio.name = 'prestador_opt';
         radio.value = prestador;
-        radio.onchange = function() {
-            prestadorSeleccionado = this.value;
-        };
-
+        radio.onchange = function() {prestadorSeleccionado = this.value;};
+        let nombreVisual = prestador;
+        if (prestador === "SAMOBA SALUD SA") {nombreVisual = "INSTITUTO MEDICO SAVIA SALUD";}        
         label.appendChild(radio);
-        label.appendChild(document.createTextNode(prestador));
+        label.appendChild(document.createTextNode(nombreVisual));
         contenedor.appendChild(label);
     });
-
-    if (esSugerido) {
-        tag.classList.remove('oculto');
-    } else {
-        tag.classList.add('oculto');
-    }
-
+    if (esSugerido) {tag.classList.remove('oculto');
+    } else {tag.classList.add('oculto');}
     cajaResultado.classList.remove('oculto');
     cajaResultado.classList.add('fade-in');
     centrar("resultadoUbicacion");
 }
-
 // --- ACCIONES DE BÚSQUEDA Y ENVÍO ---
 // URLs de las imágenes de fondo según el plan
 const URL_TARJETA_ESPECIAL = "https://raw.githubusercontent.com/Facundo598/Pruebas/refs/heads/main/img/Tarjeta3.png";
@@ -470,10 +439,19 @@ async function buscarUsuario() {
     const dni = DniInput.value.trim();
     const msgBusqueda = document.getElementById("mensajeBusqueda");
     const tarjeta = document.getElementById("tarjetaAfiliado");
+    
+    // CAPTURAMOS EL BOTÓN DE BÚSQUEDA (es el botón que está dentro de #busquedaDiv)
+    const botonBuscar = document.querySelector("#busquedaDiv button");
 
-    msgBusqueda.innerHTML = "Buscando...";
-    msgBusqueda.className = "error-dni"; // reset color azul provisional si gustas
+    // 1. PASO INMEDIATO: Mostramos el mensaje y deshabilitamos el botón
+    msgBusqueda.style.display = "block"; // Nos aseguramos de que sea visible
+    msgBusqueda.innerHTML = "Buscando, por favor aguarde...";
+    msgBusqueda.className = "error-dni"; 
     msgBusqueda.style.color = "#1976d2";
+    
+    botonBuscar.disabled = true; // Bloquea el botón para evitar doble clic
+    botonBuscar.innerText = "Buscando...";
+
     tarjeta.classList.add("oculto");
 
     // Limpieza estricta de estados de interfaz anteriores
@@ -496,15 +474,15 @@ async function buscarUsuario() {
         if (datos.existe) {
             afiliado = datos;
             ordenesDisponibles = datos.ordenesDisponibles || [];
-            msgBusqueda.innerHTML = ""; // Borra el texto de "Buscando..."
-          	msgBusqueda.style.display = "none";
+            msgBusqueda.innerHTML = ""; 
+            msgBusqueda.style.display = "none";
 
             // 1. Asignar los datos del backend a la tarjeta visual
             document.getElementById("card-nombre").innerText = datos.nombre.toUpperCase();
             document.getElementById("card-credencial").innerText = datos.credencial;
             document.getElementById("card-plan").innerText = datos.plan.toUpperCase();
             document.getElementById("card-estado").innerText = datos.estado;
-            document.getElementById("card-delegacion").innerText = datos.telefono || "Salta"; // Usa el nuevo campo dinámico si lo agregaste, sino "Salta"
+            document.getElementById("card-delegacion").innerText = datos.telefono || "Salta";
 
             // 2. Cambiar dinámicamente la imagen de fondo según el Plan
             if (datos.plan.toUpperCase() === "ESPECIAL") {
@@ -527,40 +505,53 @@ async function buscarUsuario() {
                 select.innerHTML = "<option>No disponible</option>";
                 
                 const resultado = document.getElementById("resultado");
-                resultado.innerHTML = "No cuenta con órdenes disponibles para este mes.";
+                resultado.innerHTML = "No cuenta con órdenes disponibles para este mes. Por favor póngase en contacto con la obra social.";
                 resultado.style.color = "red";
             } else {
+                const tieneCondicion = datos.condicion && datos.condicion.trim() !== "";
                 ordenesDisponibles.forEach(orden => {
                     const op = document.createElement("option");
                     op.value = orden.id;
-                    const precioFormateado = `$${orden.precio.toLocaleString('es-AR')}`;
-                    op.textContent = `${orden.nombre} (${precioFormateado})`;
+                    if (tieneCondicion) { op.textContent = orden.nombre; } 
+                    else { 
+                        const precioFormateado = `$${orden.precio.toLocaleString('es-AR')}`;
+                        op.textContent = `${orden.nombre} (${precioFormateado})`; 
+                    }
                     select.appendChild(op);
                 });
-              
-                document.getElementById("ordenesDiv").classList.remove("oculto");
-                document.getElementById("pagoDiv").classList.remove("oculto");
-                
-                const labelPlanilla = document.getElementById("opcionPlanillaLabel");
-                if (afiliado && afiliado.trabajador && afiliado.trabajador.toUpperCase() === "ACTIVO") {
-                    labelPlanilla.classList.remove("oculto-planilla");
-                } else {
-                    labelPlanilla.classList.add("oculto-planilla");
-                }
 
+                document.getElementById("ordenesDiv").classList.remove("oculto");
+                
+                if (tieneCondicion) {
+                    document.getElementById("pagoDiv").classList.add("oculto");
+                } else {
+                    document.getElementById("pagoDiv").classList.remove("oculto");
+                    const labelPlanilla = document.getElementById("opcionPlanillaLabel");
+                    if (afiliado && afiliado.trabajador && afiliado.trabajador.toUpperCase() === "ACTIVO") {
+                        labelPlanilla.classList.remove("oculto-planilla");
+                    } else {
+                        labelPlanilla.classList.add("oculto-planilla");
+                    }
+                }
                 document.getElementById("enviarDiv").classList.remove("oculto");
             }
             centrar("seccionUbicacion");
         } else {
+            msgBusqueda.style.display = "block";
             msgBusqueda.innerHTML = "DNI no encontrado";
             msgBusqueda.style.color = "red";
             tarjeta.classList.add("oculto");
         }
     } catch (error) {
         console.error(error);
+        msgBusqueda.style.display = "block";
         msgBusqueda.innerHTML = "Error al consultar datos";
         msgBusqueda.style.color = "red";
         tarjeta.classList.add("oculto");
+    } finally {
+        // AL FINALIZAR (tanto si funcionó como si dio error), devolvemos el botón a su estado original
+        botonBuscar.disabled = false;
+        botonBuscar.innerText = "Buscar";
     }
 }
 
@@ -589,37 +580,40 @@ async function enviarSolicitud() {
     const resultado = document.getElementById("resultado");
     const botonEnviar = document.querySelector("#enviarDiv button");
     
-    // 1. Recopilar datos antes de hacer nada
+    // 1. Recopilar datos básicos
     const dni = document.getElementById("dni").value.trim();
     const nombre = afiliado ? afiliado.nombre : "";
     const ordenSelect = document.getElementById("ordenes");
     const orden = ordenSelect.value;
     const ordenNombre = ordenSelect.options[ordenSelect.selectedIndex]?.text || "";
     
-    // Capturar ubicación
-    let departamento = document.getElementById("departamento").value;
-    let municipio = document.getElementById("municipio").value;
+    // Capturar la opción rápida del selector (salta_capital, guemes, anta, etc.)
     const localidadSeleccionada = document.getElementById("localidad").value;
-
-    // MAGIA: Auto-completar ubicación si usaron las opciones rápidas del primer desplegable
-    if (localidadSeleccionada && localidadSeleccionada !== "otra") {
-        if (localidadSeleccionada === "salta_capital") { departamento = "Capital"; municipio = "SALTA"; }
-        else if (localidadSeleccionada === "guemes") { departamento = "General Güemes"; municipio = "GENERAL GÜEMES"; }
-        else if (localidadSeleccionada === "anta") { departamento = "Anta"; municipio = "JOAQUIN V. GONZALEZ"; }
-        else if (localidadSeleccionada === "metan") { departamento = "Metán"; municipio = "SAN JOSE DE METAN"; }
-        else if (localidadSeleccionada === "tartagal") { departamento = "San Martín"; municipio = "TARTAGAL"; }
-    }
 
     const metodoPago = document.querySelector('input[name="metodoPago"]:checked')?.value;
     const comprobanteInput = document.getElementById("comprobanteInput");
 
-    // 2. Validaciones básicas ajustadas
-    if (!departamento || !municipio) {
-        resultado.innerHTML = "Por favor, indique su ubicación correctamente.";
+    // 2. Validaciones estrictas: No dejamos enviar si falta localidad o prestador
+    if (!localidadSeleccionada) {
+        resultado.innerHTML = "Por favor, seleccione una localidad.";
         resultado.className = "error";
         return;
     }
-    if (!metodoPago) {
+    if (!prestadorSeleccionado) {
+        resultado.innerHTML = "Por favor, seleccione un prestador de la lista.";
+        resultado.className = "error";
+        return;
+    }
+  
+    // Evaluar la condición también al enviar
+    const tieneCondicion = afiliado && afiliado.condicion && afiliado.condicion.trim() !== "";
+    let metodoPagoFinal = metodoPago;
+    
+    if (tieneCondicion) {
+        // Si tiene condición, el método de pago se genera automáticamente
+        metodoPagoFinal = "Sin cargo (" + afiliado.condicion.trim() + ")";
+    } else if (!metodoPago) {
+        // Si no tiene condición y no seleccionó nada, frena el envío
         resultado.innerHTML = "Por favor, seleccione un método de pago.";
         resultado.className = "error";
         return;
@@ -652,15 +646,15 @@ async function enviarSolicitud() {
     resultado.style.color = "#1976d2";
     resultado.className = "";
 
-    // 4. Preparar la carga útil (Payload)
+    // 4. Preparar la carga útil con los nuevos campos exactos para el script
     const formData = new URLSearchParams();
     formData.append("dni", dni);
     formData.append("nombre", nombre);
     formData.append("orden", orden);
     formData.append("ordenNombre", ordenNombre);
-    formData.append("departamento", departamento);
-    formData.append("municipio", municipio);
-    formData.append("metodoPago", metodoPago);
+    formData.append("localidadSeleccionada", localidadSeleccionada);
+    formData.append("prestadorSeleccionado", prestadorSeleccionado);
+  	formData.append("metodoPago", metodoPagoFinal);
     if (archivoBase64) {
         formData.append("archivoBase64", archivoBase64);
         formData.append("nombreArchivo", nombreArchivo);
@@ -676,14 +670,9 @@ async function enviarSolicitud() {
         const respuestaBackend = await response.json();
 
         if (respuestaBackend.ok) {
-            // 1. Limpiamos los datos del formulario por detrás (tu función ya hace esto perfecto)
             limpiarFormulario();
-            
-            // 2. Ocultamos el buscador de DNI y borramos el texto de "Procesando..."
             document.getElementById("busquedaDiv").classList.add("oculto");
             resultado.innerHTML = "";
-            
-            // 3. Mostramos el gran cartel de éxito
             document.getElementById("mensaje-exito").classList.remove("oculto"); 
         } else {
             resultado.innerHTML = "Error: " + (respuestaBackend.mensaje || "Ocurrió un inconveniente.");
@@ -699,7 +688,7 @@ async function enviarSolicitud() {
         botonEnviar.innerText = "Enviar Solicitud";
     }
 }
-
+  
 // Función dedicada a resetear la interfaz y variables a su estado inicial
 function limpiarFormulario() {
     afiliado = null;
@@ -738,7 +727,7 @@ function limpiarFormulario() {
 function salirYReiniciar() {
     document.getElementById("mensaje-exito").classList.add("oculto");
     document.getElementById("busquedaDiv").classList.remove("oculto");
-}  
+} 
 </script>
 </body>
 </html>
