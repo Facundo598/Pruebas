@@ -384,13 +384,11 @@ function sugerirPorMunicipio() {
     const depto = document.getElementById('departamento').value;
     const muni = document.getElementById('municipio').value;
     if (!depto || !muni) return;
-
     let prestadoresSugeridos = [...baseDatosSalta[depto].prestadorDefecto];
 
     // Excepción de derivación específica
     if (depto === "Rivadavia" && muni === "RIVADAVIA BANDA SUR") {
-        prestadoresSugeridos = ["Círculo Médico de Anta"];
-    }
+        prestadoresSugeridos = ["CIRCULO MEDICO DE ANTA"];}
     mostrarPrestadores(prestadoresSugeridos, true);
 }
 
@@ -422,7 +420,6 @@ function mostrarPrestadores(lista, esSugerido) {
     centrar("resultadoUbicacion");
 }
 // --- ACCIONES DE BÚSQUEDA Y ENVÍO ---
-// URLs de las imágenes de fondo según el plan
 const URL_TARJETA_ESPECIAL = "https://raw.githubusercontent.com/Facundo598/Pruebas/refs/heads/main/img/Tarjeta3.png";
 const URL_TARJETA_BASICO = "https://raw.githubusercontent.com/Facundo598/Pruebas/refs/heads/main/img/Tarjeta3.png";
 
