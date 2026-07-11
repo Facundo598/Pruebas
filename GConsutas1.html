@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Consultas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        /* --- DISEÑO COMPLETAMENTE FLUIDO Y RESPONSIVE --- */
+        .container {
+            width: 95%;
+            max-width: 1600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        
+        /* Barra de MiCam (Para tu extensión) */
+        .login-trigger-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .input-group { display: flex; align-items: center; gap: 8px; }
+        label { font-size: 17px; font-weight: bold; color: #4a5568; }
+        input[type="text"], input[type="password"] {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 17px;
+            width: 160px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus { border-color: #3182ce; }
+        .btn-disparar {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 17px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-disparar:hover { background-color: #2b6cb0; }
+
+        /* --- CONTENEDOR PRINCIPAL DEL SISTEMA (OCULTO AL INICIO) --- */
+        #bloque-sistema-privado {
+            display: none;
+        }
+
+        /* --- PANTALLA DE LOGIN (VISIBLE AL INICIO) --- */
+        #pantalla-login-sistema {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 420px;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
+        }
+        .login-card h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 24px;
+            text-align: center;
+        }
+        .login-card p {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+        .login-card .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .login-card .form-group label {
+            font-size: 15px;
+        }
+        .login-card input {
+            width: 100% !important;
+            box-sizing: border-box;
+            padding: 12px !important;
+        }
+        .btn-login-sistema {
+            width: 100%;
+            background-color: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        .btn-login-sistema:hover { background-color: #1a365d; }
+        .error-login {
+            color: #e53e3e;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 15px;
+            display: none;
+        }
+
+        /* --- Estilos del Diseño de Tabla Adaptable --- */
+        .table-container { 
+            width: 100%;
+            overflow-x: auto; 
+            margin-top: 20px; 
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 18px;
+            text-align: left;
+        }
+        th {
+            background-color: #edf2f7;
+            color: #4a5568;
+            font-weight: bold;
+            padding: 12px 15px;
+            border-bottom: 2px solid #cbd5e0;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        tr:hover { background-color: #f8fafc; }
+
+        .fecha-info { font-size: 17px; color: #718096; margin-bottom: 3px; }
+        .orden-info { font-weight: normal; color: #4a5568; font-size: 17px; }
+        .prestador-info { font-size: 17px; font-weight: bold; color: #2d3748; margin-top: 4px; }
+
+        .paciente-bloque { line-height: 1.6; }
+        .paciente-nombre {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2b6cb0;
+            margin: 0 0 4px 0;
+        }
+        .detalles-linea { color: #4a5568; font-size: 17px; }
+        .btn-enlace {
+            display: inline-block;
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .btn-enlace:hover { text-decoration: underline; }
+
+        .acciones-contenedor {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 130px;
+        }
+        .btn-accion {
+            padding: 8px 12px;
+            font-size: 17px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+        .btn-gestionar { background-color: #38a169; color: white; }
+        .btn-gestionar:hover { background-color: #2f855a; }
+        .btn-concluir { background-color: #e53e3e; color: white; }
+        .btn-concluir:hover { background-color: #c53030; }
+        
+        .estado-carga {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="pantalla-login-sistema"> 
+        <div class="login-card">
+            <h2>OSFATLYF SALTA</h2>
+            <p>Gestor de Consultas Seguro</p>
+            <div class="form-group">
+                <label for="sys-usuario">Usuario del Sistema:</label>
+                <input type="text" id="sys-usuario" placeholder="Ej: admin" value="admin">
+            </div>
+            <div class="form-group">
+                <label for="sys-password">Contraseña (Verifique caracteres):</label>
+                <input type="text" id="sys-password" placeholder="Ej: Salta2026*" value="Salta2026*">
+            </div>
+            <button type="button" id="btn-entrar-sistema" class="btn-login-sistema">Iniciar Sesión</button>
+            <div id="mensaje-error" class="error-login">Usuario o contraseña incorrectos</div>
+        </div>
+    </div>
+
+    <div id="bloque-sistema-privado" class="container">
+        <h1>Gestor de Consultas OSFATLYF SALTA</h1>
+        
+        <div class="login-trigger-bar">
+            <div class="input-group">
+                <label for="ext-usuario">Usuario:</label>
+                <input type="text" id="ext-usuario">
+            </div>
+            <div class="input-group">
+                <label for="ext-password">Contraseña:</label>
+                <input type="password" id="ext-password">
+            </div>
+            <button type="button" id="btn-iniciar-logueo" class="btn-disparar">
+                >> MiCam
+            </button>
+        </div>
+
+        <h2>Órdenes Pendientes</h2>
+        <div class="table-container">
+            <table id="tabla-consultas">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Datos del Beneficiario</th>
+                        <th style="width: 40%;">Orden / Prestado</th>
+                        <th style="width: 20%;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla">
+                    <tr>
+                        <td colspan="3" class="estado-carga">Cargando datos desde el servidor...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 🔗 Vinculado a tu misma dirección API del Cuestionario
+        const URL_API = "https://script.google.com/macros/s/AKfycbyqWzg327ovt70g4DqHWD3sAhrxrbWo5_PV4Zy5xV3QOGNTYkIP4ctULKcUx-GJEP0S/exec";
+
+        let credentials = { usuario: "", password: "" };
+        let intervaloAutoRefresh = null;
+
+        document.getElementById('btn-entrar-sistema').addEventListener('click', iniciarSesionSistema);
+
+        async function iniciarSesionSistema() {
+            const userIn = document.getElementById('sys-usuario').value.trim();
+            const passIn = document.getElementById('sys-password').value.trim();
+            const errorDiv = document.getElementById('mensaje-error');
+
+            if (!userIn || !passIn) {
+                errorDiv.innerText = "Por favor, completa ambos campos.";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            errorDiv.style.display = "none";
+            document.getElementById('btn-entrar-sistema').innerText = "Verificando...";
+
+            credentials.usuario = userIn;
+            credentials.password = passIn;
+
+            const exito = await cargarDatosSheet();
+
+            if (exito) {
+                document.getElementById('pantalla-login-sistema').style.display = "none";
+                document.getElementById('bloque-sistema-privado').style.display = "block";
+                
+                if (!intervaloAutoRefresh) {
+                    intervaloAutoRefresh = setInterval(cargarDatosSheet, 30000);
+                }
+            } else {
+                credentials.usuario = "";
+                credentials.password = "";
+                document.getElementById('btn-entrar-sistema').innerText = "Iniciar Sesión";
+                errorDiv.innerText = "Acceso denegado. Revise usuario o clave.";
+                errorDiv.style.display = "block";
+            }
+        }
+
+        async function cargarDatosSheet() {
+            if (!credentials.usuario || !credentials.password) return false;
+
+            try {
+                // 🛠️ LA SOLUCIÓN CLAVE: Ahora armamos los parámetros idéntico a cómo mandás la solicitud en el cuestionario
+                const params = new URLSearchParams();
+                params.append("action", "obtenerSolicitudes");
+                params.append("usuario", credentials.usuario);
+                params.append("password", credentials.password);
+                
+                // Realizamos la consulta con la estructura correcta admitida por tu App Script
+                const respuesta = await fetch(`${URL_API}?${params.toString()}`);
+                const resultadoJson = await respuesta.json();
+
+                if (resultadoJson.ok !== true) {
+                    console.error("Respuesta negativa del servidor:", resultadoJson.mensaje || resultadoJson.error);
+                    return false;
+                }
+
+                const cuerpoTabla = document.getElementById('cuerpo-tabla');
+                cuerpoTabla.innerHTML = ''; 
+
+                const solicitudes = resultadoJson.datos || [];
+
+                for (let i = 0; i < solicitudes.length; i++) {
+                    const fila = solicitudes[i];
+                    const tr = document.createElement('tr');
+                    
+                    tr.dataset.fecha = fila.fecha;
+                    tr.dataset.dni = fila.dni;
+                    tr.dataset.nombre = fila.nombre;
+                    tr.dataset.ordenId = fila.ordenId;
+                    tr.dataset.orden = fila.ordenNombre;
+                    tr.dataset.precio = fila.precio;
+                    tr.dataset.prestador = fila.prestador;
+                    tr.dataset.pago = fila.metodoPago;
+                    tr.dataset.comprobante = fila.urlComprobante;
+                    tr.dataset.filaIndex = fila.filaIndex;
+
+                    let comprobanteHTML = '';
+                    const esPlanilla = fila.metodoPago ? fila.metodoPago.toLowerCase().includes('planilla') : false;
+                    const esNoAplica = fila.urlComprobante ? fila.urlComprobante.toLowerCase() === 'no aplica' : true;
+
+                    if (fila.urlComprobante && fila.urlComprobante.startsWith('http')) {
+                        comprobanteHTML = `<a href="${fila.urlComprobante}" target="_blank" class="btn-enlace">Ver Comprobante</a>`;
+                    } else if (!esPlanilla && !esNoAplica) {
+                        comprobanteHTML = `<span style="color: #a0aec0; font-style: italic; font-size: 13px;">Sin comprobante</span>`;
+                    }
+                  
+                  tr.innerHTML = `
+                      <td>
+                          <div class="paciente-bloque">
+                              <div class="fecha-info">📅 ${fila.fecha || ''}</div>
+                              <p class="paciente-nombre">${fila.nombre || 'Sin Nombre'}</p>
+                              <div class="detalles-linea"><strong>DNI:</strong> ${fila.dni || ''}</div>
+                              <div class="detalles-linea"><strong>Recepción:</strong> ${fila.recepcion || '-'}</div>
+                              <div class="detalles-linea"><strong>Contacto:</strong> ${fila.contacto || '-'}</div>
+                          </div>
+                      </td>
+                      <td>
+                          <div class="prestador-info">🏢 ${fila.prestador || ''}</div>
+                          <div class="orden-info">📋 ${fila.ordenNombre || ''}</div>
+                          <div class="detalles-linea"><strong>Precio:</strong> $${fila.precio || '0'}</div>
+                          <div class="detalles-linea"><strong>Método de Pago:</strong> ${fila.metodoPago || ''}</div>
+                          <div style="margin-top: 8px;">${comprobanteHTML}</div>
+                      </td>
+                      <td>
+                          <div class="acciones-contenedor">
+                              <button class="btn-accion btn-gestionar">Gestionar</button>
+                              <button class="btn-accion btn-concluir">Concluir</button>
+                          </div>
+                      </td>
+                  `;
+
+                    cuerpoTabla.appendChild(tr);
+                }
+
+                if (solicitudes.length === 0) {
+                    cuerpoTabla.innerHTML = `<tr><td colspan="3" class="estado-carga">No hay órdenes pendientes. 🎉</td></tr>`;
+                }
+
+                asignarEventosBotones();
+                return true;
+
+            } catch (error) {
+                console.error("Error de comunicación de red:", error);
+                return false;
+            }
+        }
+
+        function asignarEventosBotones() {
+            document.querySelectorAll('.btn-concluir').forEach(boton => {
+                boton.onclick = async function(e) {
+                    const fila = e.target.closest('tr');
+                    const numFilaSheet = fila.dataset.filaIndex;
+                    const nombrePaciente = fila.dataset.nombre;
+                    const usuarioMiCam = document.getElementById('ext-usuario').value.trim();
+                    
+                    if (!usuarioMiCam) {
+                        alert("⚠️ Debe ingresar su nombre en el campo 'Usuario' (sección MiCam) para concluir.");
+                        return;}
+        
+                    if (confirm(`¿Desea CONCLUIR la orden de:\n\n👤 ${nombrePaciente}?`)) {
+                        e.target.disabled = true;
+                        e.target.innerText = "Procesando...";
+                        const formData = new FormData();
+                        formData.append("action", "concluir");
+                        formData.append("filaIndex", numFilaSheet);
+                        formData.append("usuario", usuarioMiCam);
+                        // También enviamos credenciales por si tu servidor las exige en el POST
+                        formData.append("password", credentials.password); 
+        
+                        try {
+                            const res = await fetch(URL_API, {
+                                method: 'POST',
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded",
+                                },
+                                body: new URLSearchParams({
+                                    action: "concluir",
+                                    filaIndex: numFilaSheet,
+                                    usuario: usuarioMiCam
+                                })
+                            });
+                          
+                          const data = await res.json();
+                            if (data.ok) {
+                                alert("✅ Orden concluida correctamente.");
+                                cargarDatosSheet(); 
+                            } else {
+                                throw new Error(data.error || "Error desconocido");
+                            }
+                        } catch (error) {alert("❌ Error: " + error.message);e.target.disabled = false; e.target.innerText = "Concluir";
+                        }
+                    }
+                };
+            });
+        }
+              
+              
+    </script>
+</body>
+</html>
