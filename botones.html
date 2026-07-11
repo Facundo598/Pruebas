@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prueba de Botones</title>
+    <style>
+        .grupo { margin: 20px; padding: 10px; border: 1px solid #ccc; }
+        button { margin: 5px; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h2>Pulsa los botones y mira cuál te avisa</h2>
+
+    <div class="grupo">
+        <h3>Grupo 1: Evento directo (el que tenías)</h3>
+        <button onclick="alert('¡Funcionó el Grupo 1!')">Botón 1 (Onclick)</button>
+    </div>
+
+    <div class="grupo">
+        <h3>Grupo 2: Evento detectado por Id</h3>
+        <button id="btn2">Botón 2 (ById)</button>
+    </div>
+
+    <div class="grupo" id="contenedor3">
+        <h3>Grupo 3: Delegación de eventos (El más moderno)</h3>
+        <button class="btn-delegado">Botón 3 (Delegado)</button>
+        <button class="btn-delegado">Botón 4 (Delegado)</button>
+    </div>
+
+    <div class="grupo">
+        <h3>Grupo 4: EventListener manual</h3>
+        <button id="btn5">Botón 5 (Listener)</button>
+    </div>
+
+    <script>
+        // Lógica para el Grupo 2
+        document.getElementById('btn2').addEventListener('click', function() {
+            alert('¡Funcionó el Grupo 2!');
+        });
+
+        // Lógica para el Grupo 3 (Delegación: detecta cualquier clic dentro del contenedor)
+        document.getElementById('contenedor3').addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-delegado')) {
+                alert('¡Funcionó el Grupo 3!');
+            }
+        });
+
+        // Lógica para el Grupo 4
+        document.getElementById('btn5').addEventListener('click', function() {
+            alert('¡Funcionó el Grupo 4!');
+        });
+    </script>
+</body>
+</html>
