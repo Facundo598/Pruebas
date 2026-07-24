@@ -138,14 +138,6 @@
                 document.getElementById('user').value = savedUser;
                 document.getElementById('pass').value = savedPass;
                 cargarDatos(); }
-            // Listener para el botón MICAM de la barra externa
-            document.getElementById('btn-iniciar-logueo')?.addEventListener('click', () => {
-                const usuario = document.getElementById('ext-usuario')?.value;
-                const pass = document.getElementById('ext-password')?.value;
-                const evento = new CustomEvent('solicitudMicamLogin', {
-                    detail: { micam_user: usuario, micam_pass: pass, solicitud_activa: false }
-                });
-                document.dispatchEvent(evento); });
         };
 
         async function cargarDatos() {
