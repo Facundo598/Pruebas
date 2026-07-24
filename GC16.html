@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+      body {
+        background: linear-gradient(135deg, #5E5D5D 20%, #2756BA 80%);
+        background-attachment: fixed; min-height: 100vh; margin: 0; padding: 0; }
+      #seccionGestion { padding: 20px; background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px); margin: 20px auto; border-radius: 20px;
+        width: 90%; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2); }
+        /* Estilos de la tabla */
+        table { width: 100%; border-collapse: separate; font-family: 'Segoe UI', sans-serif; border-spacing: 10px; }
+        th { background: rgba(29, 88, 222, 0.3); padding: 12px; text-align: left;font-size: 20px; }
+        th:first-child { border-top-left-radius: 15px; border-bottom-left-radius: 15px; }
+        th:last-child { border-top-right-radius: 15px; border-bottom-right-radius: 15px; }
+      	td { padding: 4px; border-bottom: 1px solid #ddd; vertical-align: top; border-bottom: 1px solid #4a4a4a;}
+        .paciente-nombre { font-size: 17px; font-weight: bold; color: #2b6cb0; margin: 0 0 4px 0; }
+        .fecha-info { font-size: 17px; margin-bottom: 3px; }
+        .detalles-linea { font-size: 17px; }
+        .prestador-info { font-weight: bold; color: #0056b3; margin-bottom: 5px; }
+        .orden-info { font-weight: 600; color: #28a745; margin-bottom: 5px; }
+        .acciones-contenedor { display: flex; flex-direction: column; gap: 5px; }
+        .btn-accion { padding: 8px; cursor: pointer; border: none; border-radius: 4px; font-size: 20px; }
+        .btn-gestionar { background: #5ECC7A; }
+        .btn-concluir { background: #dc3545; color: white; }
+        .btn-enlace { display: inline-block; padding: 5px 10px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8em; }
+
+        /* ESTILOS DEL MODAL (Tarjeta Profesional) */
+        .modal-fondo { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .card-modal { background: white; width: 350px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-family: sans-serif; }
+        .header { background: #f1f3f5; padding: 15px; font-weight: bold; border-bottom: 1px solid #ddd; }
+        .body { padding: 25px; text-align: center; color: #555; }
+        .footer { padding: 15px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; }
+        .btn-cerrar { background: #e9ecef; color: #333; padding: 8px 15px; border-radius: 6px; cursor: pointer; border: none; }
+        .btn-aceptar { background: #28a745; color: white; padding: 8px 15px; border-radius: 6px; 
+        	cursor: pointer; border: none; }
+    	.container-login { height: 100vh; display: flex; justify-content: center; align-items: center;
+	    	background: linear-gradient(135deg, #5E5D5D 20%, #2756BA 80%);}
+      	.glass-card { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(15px); padding: 40px; 
+            border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); 
+            box-shadow: 0 50px 20px 0 rgba(0, 0, 0, 0.37); width: 350px; text-align: center; color: white;}
+      	.input-group { display: flex; flex-direction: row; align-items: center; gap: 10px; }
+        input { width: 100%; padding: 12px 15px; background: rgba(255, 255, 255, 0.05); font-size: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: white; outline: none;}
+        button.btn-login { width: 100%; padding: 12px; background: white; color: #801DE2; border: none; 
+            border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.8s;font-size: 18px;}
+      	/* ESTILOS LOGIN MICAM */
+        .contenedor-externo {width: 100%; background: rgba(255, 255, 255, 0.5); border-radius: 20px;}
+        .contenedor-externo input {border: 1.6px solid #4a4a4a; max-width: 200px;}
+        .input-group label {color: #2b6cb0; font-size: 20px; font-weight: bold; }
+      	.tabla-sin-bordes td {border-bottom: none !important; }
+
+    </style>
+</head>
+<body>
+
+<!-- PANTALLA LOGIN -->
+    <div id="seccionLogin" class="container-login">
+        <div style="margin-bottom: 20px;" class="glass-card">
+            <h1>OSFATLYF - SALTA</h1>
+            <div style="margin-bottom: 20px;" class="input-group">
+                <input type="text" id="user" placeholder="Usuario" value="admin">
+            </div>
+            <div style="margin-bottom: 20px;" class="input-group">
+                <input type="password" id="pass" placeholder="Contraseña" value="Salta2026*">
+            </div>
+            <button class="btn-login" onclick="cargarDatos()">INGRESAR</button>
+        </div>
+    </div>
+
+    <!-- BARRA EXTERNA (Oculta por defecto) -->
+    <div id="barra-externa" style="display: none; text-align: center; margin-top: 30px; color: white; font-family: sans-serif;">
+        <h1>OSFATLYF - SALTA</h1>
+
+        <div class="contenedor-externo" style="width: 90%; margin: 0 auto; padding: 5px;">
+            <table class="tabla-sin-bordes" style="width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 5px;">
+                <tr>
+                    <td style="width: 40%;"> <div class="input-group">
+                            <label>Usuario:</label>
+                            <input type="text" id="ext-usuario" value="Cperalta"> </div> </td>
+                    <td style="width: 40%;"> <div class="input-group">
+                            <label>Contraseña:</label>
+                            <input type="text" id="ext-password" value="916adm194"> </div> </td>
+                    <td style="width: 20%; vertical-align: middle;">
+                        <button type="button" id="btn-iniciar-logueo" class="btn-login" style="width: 100%; padding: 7px;">
+                            MICAM </button> </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- PANTALLA 2: GESTIÓN -->
+<!-- PANTALLA 2: GESTIÓN -->
+<div id="seccionGestion" style="display: none; padding: 20px;">
+    <!-- Contenedor flex para alinear título y botón -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="margin: 0;">Gestión de Consultas</h1>
+        <button onclick="cerrarSesion()" style="padding: 8px 15px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 6px;">
+            Cerrar Sesión
+        </button>
+    </div>
+    
+    <table id="tabla-consultas">
+        <thead> 
+            <tr>
+                <th style="width: 40%;">Datos del Beneficiario</th>
+                <th style="width: 40%;">Orden / Prestador</th>
+                <th style="width: 20%;">Acciones</th> 
+            </tr> 
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+    </table>
+</div>
+
+    <!-- MODAL -->
+    <div id="miModal" class="modal-fondo">
+        <div class="card-modal">
+            <div class="header">📋 Confirmar Conclusión</div>
+            <div class="body"> <p id="textoModal">¿Deseas concluir la orden?</p> </div>
+            <div class="footer">
+                <button class="btn-cerrar" onclick="cerrarModal()">Cancelar</button>
+                <button id="btnAceptar" class="btn-aceptar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+  
+    <script>
+        const URL_API = "https://script.google.com/macros/s/AKfycbyqWzg327ovt70g4DqHWD3sAhrxrbWo5_PV4Zy5xV3QOGNTYkIP4ctULKcUx-GJEP0S/exec";
+        let datosPendientes = { fila: null, e: null };
+      
+        window.onload = () => {
+            const savedUser = localStorage.getItem('usuario');
+            const savedPass = localStorage.getItem('password');
+            if (savedUser && savedPass) {
+                document.getElementById('user').value = savedUser;
+                document.getElementById('pass').value = savedPass;
+                cargarDatos(); }
+            // Listener para el botón MICAM de la barra externa
+            document.getElementById('btn-iniciar-logueo')?.addEventListener('click', () => {
+                const usuario = document.getElementById('ext-usuario')?.value;
+                const pass = document.getElementById('ext-password')?.value;
+                const evento = new CustomEvent('solicitudMicamLogin', {
+                    detail: { micam_user: usuario, micam_pass: pass, solicitud_activa: false }
+                });
+                document.dispatchEvent(evento); });
+        };
+
+        async function cargarDatos() {
+            const user = document.getElementById('user').value;
+            const pass = document.getElementById('pass').value;
+            localStorage.setItem('usuario', user);
+            localStorage.setItem('password', pass);
+            document.getElementById('barra-externa').style.display = 'block';
+            document.getElementById('seccionLogin').style.display = 'none';
+            document.getElementById('seccionGestion').style.display = 'block';
+            const res = await fetch(`${URL_API}?action=obtenerSolicitudes&usuario=${user}&password=${pass}`);
+            const data = await res.json();
+            if (!data.ok) return alert("Error: " + data.error);
+
+            const tbody = document.getElementById('cuerpoTabla');
+            tbody.innerHTML = "";
+
+            // Aquí verificamos si hay datos
+            if (!data.datos || data.datos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #607DAB; font-size: 20px;">
+                    <strong>No existen solicitudes pendientes.¡Buen trabajo, todo está al día!</strong>
+                </td></tr>`;
+                return;}
+          
+          	// Si hay datos, continúa con tu forEach habitual...
+            data.datos.forEach(item => {
+                const tr = document.createElement('tr');
+              	tr.dataset.dni = item.dni || '';
+                tr.dataset.nombre = item.nombre || '';
+                tr.dataset.ordennombre = item.ordenNombre || '';
+                tr.dataset.precio = item.precio || '';
+                tr.dataset.prestador = item.prestador || '';
+                tr.dataset.metodopago = item.metodoPago || '';
+                tr.innerHTML = `
+                    <td>
+                        <div class="fecha-info">📅 ${item.fecha || 'Sin fecha'}</div>
+                        <p class="paciente-nombre">${item.nombre}</p>
+                        <div class="detalles-linea"><strong>DNI:</strong> ${item.dni}</div>
+                        <div class="detalles-linea"><strong>Recepción:</strong> ${item.recepcion || 'No especificada'}</div>
+                        <div class="detalles-linea"><strong>Contacto:</strong> ${item.contacto || 'No especificado'}</div>
+                    </td>
+                    <td>
+                        <div class="prestador-info">🏢 ${item.prestador}</div>
+                        <div class="orden-info">📋 ${item.ordenNombre || ''}</div>
+                        <div class="detalles-linea"><strong>Precio:</strong> $${item.precio}</div>
+                        <div class="detalles-linea"><strong>Método de Pago:</strong> ${item.metodoPago || ''}</div>
+                        ${item.comprobante && item.comprobante !== 'No aplica' ? `<div style="margin-top: 8px;"><a href="${item.comprobante}" target="_blank" class="btn-enlace">Ver Comprobante</a></div>` : ''}
+                    </td>
+                    <td>
+                        <div class="acciones-contenedor">
+                            <button class="btn-accion btn-gestionar">Gestionar</button>
+                            <button class="btn-accion btn-concluir">Concluir</button>
+                        </div>
+                    </td>`;
+                
+                tr.querySelector('.btn-concluir').addEventListener('click', (e) => {
+                    datosPendientes = { fila: item.filaIndex, e: e };
+                    document.getElementById('textoModal').innerText = `¿Seguro que deseas concluir la orden de ${item.nombre}?`;
+                    document.getElementById('miModal').style.display = 'flex';
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function cerrarModal() { document.getElementById('miModal').style.display = 'none'; }    
+      
+        document.getElementById('btnAceptar').addEventListener('click', async (event) => {
+            const btnAceptar = event.currentTarget;
+            const { fila } = datosPendientes;
+            const usuarioVal = document.getElementById('user').value;
+            const passwordVal = document.getElementById('pass').value;
+
+            btnAceptar.disabled = true;
+            btnAceptar.innerText = "Enviando...";
+        
+            const params = new URLSearchParams({
+                action: "concluir", 
+                filaIndex: fila, 
+                usuario: usuarioVal,
+                password: passwordVal
+            });
+        
+            try {
+                const res = await fetch(URL_API, { method: "POST", body: params });
+                const result = await res.json();
+                
+                if (result.ok) {
+                    cerrarModal();
+                  	document.getElementById('cuerpoTabla').innerHTML = "";
+                  	await cargarDatos();
+                    alert("Orden concluida correctamente.");
+                } else {
+                    alert("Error al concluir: " + result.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error de conexión al servidor.");
+            } finally {
+                btnAceptar.disabled = false;
+                btnAceptar.innerText = "Aceptar";
+            }
+        });
+      	function cerrarSesion() {
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('password');
+            location.reload();}
+      
+    </script>
+</body>
+</html>
