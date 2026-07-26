@@ -475,7 +475,6 @@ async function buscarUsuario() {
 
         if (datos.existe) {
             afiliado = datos;
-          	//ordenesDisponibles = datos.ordenesDisponibles || [];
           	ordenesDisponibles = await obtenerOrdenesDisponibles(datos.dni, datos.plan);
             msgBusqueda.innerHTML = ""; 
             msgBusqueda.style.display = "none";
@@ -716,9 +715,7 @@ async function enviarSolicitud() {
     }
 
     try {
-      	//const response = await fetch(URL_API, { method: "POST", body: formData});
       	const response = await fetch(URL_GESTION, {method: "POST", body: formData});
-        
         const respuestaBackend = await response.json();
 
         if (respuestaBackend.ok) {
