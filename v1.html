@@ -466,8 +466,12 @@ async function buscarUsuario() {
     prestadorSeleccionado = null;
 
     try {
-      	const respuesta = await fetch(URL_AFILIADOS + "?action=buscar&dni=" + encodeURIComponent(dni));
+        const formData = new URLSearchParams();
+        formData.append("action", "buscar");
+        formData.append("dni", dni);
+        const respuesta = await fetch(URL_AFILIADOS, { method: "POST", body: formData });
         const datos = await respuesta.json();
+      
 
         if (datos.existe) {
             afiliado = datos;
@@ -699,11 +703,10 @@ async function enviarSolicitud() {
     formData.append("nombre", nombre);
     formData.append("orden", orden);
     formData.append("ordenNombre", ordenNombre);
+  	formData.append("plan", afiliado ? afiliado.plan : "");
     formData.append("localidadSeleccionada", localidadSeleccionada);
     formData.append("prestadorSeleccionado", prestadorSeleccionado);
     formData.append("metodoPago", metodoPagoFinal);
-    
-    // ANEXAR LOS DOS NUEVOS PARÁMETROS PARA TU SCRIPT EN GOOGLE
     formData.append("metodoRecepcion", metodoRecepcion);
     formData.append("datoContacto", datoContacto);
 
