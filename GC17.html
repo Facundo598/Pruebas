@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -55,8 +53,8 @@
     </style>
 </head>
 <body>
-
-<!-- PANTALLA LOGIN -->
+  
+  	<!-- PANTALLA LOGIN -->
     <div id="seccionLogin" class="container-login">
         <div style="margin-bottom: 20px;" class="glass-card">
             <h1>OSFATLYF - SALTA</h1>
@@ -67,6 +65,7 @@
                 <input type="password" id="pass" placeholder="Contraseña" value="Salta2026*">
             </div>
             <button class="btn-login" onclick="cargarDatos()">INGRESAR</button>
+            <div id="msgBusqueda" style="margin-top: 15px; font-weight: bold; font-size: 20px;"></div>
         </div>
     </div>
 
@@ -91,11 +90,8 @@
         </div>
     </div>
 
-
-    <!-- PANTALLA 2: GESTIÓN -->
 <!-- PANTALLA 2: GESTIÓN -->
 <div id="seccionGestion" style="display: none; padding: 20px;">
-    <!-- Contenedor flex para alinear título y botón -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h1 style="margin: 0;">Gestión de Consultas</h1>
         <button onclick="cerrarSesion()" style="padding: 8px 15px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 6px;">
@@ -138,72 +134,77 @@
                 document.getElementById('user').value = savedUser;
                 document.getElementById('pass').value = savedPass;
                 cargarDatos(); }
-        };
+        };          
 
-        async function cargarDatos() {
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
-            localStorage.setItem('usuario', user);
-            localStorage.setItem('password', pass);
-            document.getElementById('barra-externa').style.display = 'block';
-            document.getElementById('seccionLogin').style.display = 'none';
-            document.getElementById('seccionGestion').style.display = 'block';
-            const res = await fetch(`${URL_API}?action=obtenerSolicitudes&usuario=${user}&password=${pass}`);
-            const data = await res.json();
-            if (!data.ok) return alert("Error: " + data.error);
-
-            const tbody = document.getElementById('cuerpoTabla');
-            tbody.innerHTML = "";
-
-            // Aquí verificamos si hay datos
-            if (!data.datos || data.datos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #607DAB; font-size: 20px;">
-                    <strong>No existen solicitudes pendientes.¡Buen trabajo, todo está al día!</strong>
-                </td></tr>`;
-                return;}
-          
-          	// Si hay datos, continúa con tu forEach habitual...
-            data.datos.forEach(item => {
-                const tr = document.createElement('tr');
-              	tr.dataset.dni = item.dni || '';
-                tr.dataset.nombre = item.nombre || '';
-                tr.dataset.ordennombre = item.ordenNombre || '';
-                tr.dataset.precio = item.precio || '';
-                tr.dataset.prestador = item.prestador || '';
-                tr.dataset.metodopago = item.metodoPago || '';
-                tr.innerHTML = `
-                    <td>
-                        <div class="fecha-info">📅 ${item.fecha || 'Sin fecha'}</div>
-                        <p class="paciente-nombre">${item.nombre}</p>
-                        <div class="detalles-linea"><strong>DNI:</strong> ${item.dni}</div>
-                        <div class="detalles-linea"><strong>Recepción:</strong> ${item.recepcion || 'No especificada'}</div>
-                        <div class="detalles-linea"><strong>Contacto:</strong> ${item.contacto || 'No especificado'}</div>
-                    </td>
-                    <td>
-                        <div class="prestador-info">🏢 ${item.prestador}</div>
-                        <div class="orden-info">📋 ${item.ordenNombre || ''}</div>
-                        <div class="detalles-linea"><strong>Precio:</strong> $${item.precio}</div>
-                        <div class="detalles-linea"><strong>Método de Pago:</strong> ${item.metodoPago || ''}</div>
-                        ${item.comprobante && item.comprobante !== 'No aplica' ? `<div style="margin-top: 8px;"><a href="${item.comprobante}" target="_blank" class="btn-enlace">Ver Comprobante</a></div>` : ''}
-                    </td>
-                    <td>
-                        <div class="acciones-contenedor">
-                            <button class="btn-accion btn-gestionar">Gestionar</button>
-                            <button class="btn-accion btn-concluir">Concluir</button>
-                        </div>
-                    </td>`;
-                
-                tr.querySelector('.btn-concluir').addEventListener('click', (e) => {
-                    datosPendientes = { fila: item.filaIndex, e: e };
-                    document.getElementById('textoModal').innerText = `¿Seguro que deseas concluir la orden de ${item.nombre}?`;
-                    document.getElementById('miModal').style.display = 'flex';
-                });
-                tbody.appendChild(tr);
-            });
-        }
+      async function cargarDatos() {
+          const user = document.getElementById('user').value;
+          const pass = document.getElementById('pass').value;
+          const btnLogin = document.querySelector('.btn-login');
+          const msgBusqueda = document.getElementById('msgBusqueda');
+          msgBusqueda.innerHTML = ""; if (btnLogin) { btnLogin.disabled = true; btnLogin.innerText = "Verificando..."; }
+          try {
+              const res = await fetch(`${URL_API}?action=obtenerSolicitudes&usuario=${user}&password=${pass}`);
+              const data = await res.json();
+              if (!data.ok) { msgBusqueda.innerHTML = "Usuario o contraseña incorrectos"; return; }
+              localStorage.setItem('usuario', user);
+              localStorage.setItem('password', pass);
+              document.getElementById('barra-externa').style.display = 'block';
+              document.getElementById('seccionLogin').style.display = 'none';
+              document.getElementById('seccionGestion').style.display = 'block';
+              
+              const tbody = document.getElementById('cuerpoTabla');
+              tbody.innerHTML = "";
+      
+              if (!data.datos || data.datos.length === 0) {
+                  tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #607DAB; font-size: 20px;">
+                      <strong>No existen solicitudes pendientes. ¡Buen trabajo, todo está al día!</strong>
+                  </td></tr>`;
+                  return;
+              }
+            
+              data.datos.forEach(item => {
+                  const tr = document.createElement('tr');
+                  tr.dataset.dni = item.dni || '';
+                  tr.dataset.nombre = item.nombre || '';
+                  tr.dataset.ordennombre = item.ordenNombre || '';
+                  tr.dataset.precio = item.precio || '';
+                  tr.dataset.prestador = item.prestador || '';
+                  tr.dataset.metodopago = item.metodoPago || '';
+                  tr.innerHTML = `
+                      <td>
+                          <div class="fecha-info">📅 ${item.fecha || 'Sin fecha'}</div>
+                          <p class="paciente-nombre">${item.nombre}</p>
+                          <div class="detalles-linea"><strong>DNI:</strong> ${item.dni}</div>
+                          <div class="detalles-linea"><strong>Recepción:</strong> ${item.recepcion || 'No especificada'}</div>
+                          <div class="detalles-linea"><strong>Contacto:</strong> ${item.contacto || 'No especificado'}</div>
+                      </td>
+                      <td>
+                          <div class="prestador-info">🏢 ${item.prestador}</div>
+                          <div class="orden-info">📋 ${item.ordenNombre || ''}</div>
+                          <div class="detalles-linea"><strong>Precio:</strong> $${item.precio}</div>
+                          <div class="detalles-linea"><strong>Método de Pago:</strong> ${item.metodoPago || ''}</div>
+                          ${item.comprobante && item.comprobante !== 'No aplica' ? `<div style="margin-top: 8px;"><a href="${item.comprobante}" target="_blank" class="btn-enlace">Ver Comprobante</a></div>` : ''}
+                      </td>
+                      <td>
+                          <div class="acciones-contenedor">
+                              <button class="btn-accion btn-gestionar">Gestionar</button>
+                              <button class="btn-accion btn-concluir">Concluir</button>
+                          </div>
+                      </td>`;
+                  
+                  tr.querySelector('.btn-concluir').addEventListener('click', (e) => {
+                      datosPendientes = { fila: item.filaIndex, e: e };
+                      document.getElementById('textoModal').innerText = `¿Seguro que deseas concluir la orden de ${item.nombre}?`;
+                      document.getElementById('miModal').style.display = 'flex';
+                  });
+                  tbody.appendChild(tr);
+              });
+          } catch (err) { console.error(err); msgBusqueda.innerHTML = "Error de conexión al servidor.";
+          } finally { if (btnLogin) { btnLogin.disabled = false; btnLogin.innerText = "INGRESAR"; }}
+     	}
 
         function cerrarModal() { document.getElementById('miModal').style.display = 'none'; }    
-      
+
         document.getElementById('btnAceptar').addEventListener('click', async (event) => {
             const btnAceptar = event.currentTarget;
             const { fila } = datosPendientes;
