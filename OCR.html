@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba Mínima OCR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+
+    <input type="file" id="archivoInput" accept="image/jpeg, image/png, application/pdf, image/webp" onchange="procesarArchivo()">
+    
+    <small style="display: block; color: #555; margin-top: 5px;">
+        <strong>Formatos admitidos:</strong> JPG, PNG, PDF, HEIC, WEBP.<br>
+        <strong>Tamaño permitido:</strong> Mínimo 20 KB - Máximo 2 MB (PDF mínimo 10 KB).
+    </small>
+
+    <div id="contenedorTexto" style="margin-top: 15px; display: none;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Texto leído:</label>
+        <textarea id="textoLeido" rows="6" style="width: 100%; max-width: 400px;" readonly></textarea>
+    </div>
+
+    <div id="mensaje" style="margin-top: 10px; font-weight: bold;"></div>
+
+<script>
+    async function procesarArchivo() {
+        const input = document.getElementById("archivoInput");
+        const mensaje = document.getElementById("mensaje");
+        const contenedor = document.getElementById("contenedorTexto");
+        const textarea = document.getElementById("textoLeido");
+
+        mensaje.innerHTML = "";
+        contenedor.style.display = "none";
+        textarea.value = "";
+
+        if (!input.files || input.files.length === 0) return;
+
+        let file = input.files[0];
+        const nombre = file.name.toLowerCase();
+
+        // 1. Validar formato
+        const permitidos = ['.jpg', '.jpeg', '.png', '.pdf', '.webp', '.heic'];
+        if (!permitidos.some(ext => nombre.endsWith(ext))) {
+            alert("Formato no admitido.");
+            input.value = "";
+            return;
+        }
+
+        // 2. Validar tamaño
+        const max = 2 * 1024 * 1024;
+        let min = (nombre.endsWith('.pdf') || file.type === 'application/pdf') ? 10 * 1024 : 20 * 1024;
+
+        if (file.size < min || file.size > max) {
+            alert("El archivo no cumple con el tamaño permitido (20KB - 2MB).");
+            input.value = "";
+            return;
+        }
+
+        // 3. Convertir HEIC si aplica
+        if (nombre.endsWith('.heic') || file.type === 'image/heic') {
+            try {
+                const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.8 });
+                file = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" });
+            } catch (e) {
+                alert("Error al procesar HEIC.");
+                input.value = "";
+                return;
+            }
+        }
+
+        // 4. OCR con Tesseract.js
+        mensaje.innerHTML = "Leyendo imagen...";
+        mensaje.style.color = "orange";
+
+        try {
+            const worker = await Tesseract.createWorker('eng');
+            const ret = await worker.recognize(file);
+            await worker.terminate();
+
+            textarea.value = ret.data.text;
+            contenedor.style.display = "block";
+            mensaje.innerHTML = "✓ Lectura completada.";
+            mensaje.style.color = "green";
+
+        } catch (e) {
+            mensaje.innerHTML = "❌ Error al leer la imagen.";
+            mensaje.style.color = "red";
+            input.value = "";
+        }
+    }
+</script>
+</body>
+</html>
