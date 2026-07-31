@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orden Consulta</title> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -86,6 +88,7 @@ button:hover{background:#1565c0;}
 .texto-exito { font-size: 18px; color: #333; line-height: 1.5; margin-bottom: 25px; }
 .btn-salir { background: #555; width: 60%; font-weight: bold; }
 .btn-salir:hover { background: #333; }
+.error { color: red !important; font-weight: bold; }
   
 </style>
 </head>
@@ -170,9 +173,15 @@ button:hover{background:#1565c0;}
         </div>
     </div>
   
-    <div id="comprobanteDiv" class="seccion oculto">
-        <label>Subir comprobante de transferencia (Formato imagen: JPG, PNG)</label>
-        <input type="file" id="comprobanteInput" accept="image/jpeg, image/png">
+  	<div id="comprobanteDiv" class="seccion oculto">
+        <small style="display: block; color: #555; margin-top: 5px;">
+          Subir comprobante (Formatos: JPG, PNG, PDF, HEIC, WEBP)
+      	</small>
+        <input type="file" id="comprobanteInput" accept="image/jpeg, image/png, application/pdf, image/webp, image/heic" onchange="procesarArchivo()">
+        <small style="display: block; color: #555; margin-top: 5px;">
+            Tamaño permitido: Mínimo 20 KB - Máximo 2 MB (PDF mínimo 10 KB).
+        </small>
+        <div id="mensajeComprobante" style="margin-top: 10px;"></div>
     </div>
 
     <div id="recepcionDiv" class="seccion oculto">
@@ -207,12 +216,10 @@ button:hover{background:#1565c0;}
         <button class="btn-salir" onclick="salirYReiniciar()">Salir y volver al inicio</button>
     </div>
 </div>
-
 <script>
 const URL_AFILIADOS = "https://script.google.com/macros/s/AKfycbxnC103OPZbsknMUpztQYZuQbZZTzyCkzgbO6GzkFd0FcvRxk1i8fw0yyUhxDATuLcr/exec";
-const URL_GESTION   = "https://script.google.com/macros/s/AKfycbxvc6Lm4SWvLleZ-ReQR3QIQoD4Yq2F3jqwVg1DVShsf9RWNkpRs4CY8I0TyDCvi-zC/exec"
-const URL_API = "https://script.google.com/macros/s/AKfycbyqWzg327ovt70g4DqHWD3sAhrxrbWo5_PV4Zy5xV3QOGNTYkIP4ctULKcUx-GJEP0S/exec";
-  
+const URL_GESTION = "https://script.google.com/macros/s/AKfycbxvc6Lm4SWvLleZ-ReQR3QIQoD4Yq2F3jqwVg1DVShsf9RWNkpRs4CY8I0TyDCvi-zC/exec";  
+
 const baseDatosSalta = {
     "Anta": {
         municipios: ["APOLINARIO SARAVIA", "EL QUEBRACHAL", "GENERAL PIZARRO", "JOAQUIN V. GONZALEZ", "LAS LAJITAS"],
@@ -320,21 +327,29 @@ let afiliado = null;
 let ordenesDisponibles = [];
 let prestadorSeleccionado = null;
 
+// ÚNICA DECLARACIÓN DE VARIABLES GLOBALES PARA EL COMPROBANTE Y OCR
+let textoComprobanteCapturado = "";
+let archivoProcesadoValido = null;
+
 window.onload = function() {
     const selectDepto = document.getElementById('departamento');
-    Object.keys(baseDatosSalta).sort().forEach(depto => {
-        const opt = document.createElement('option');
-        opt.value = depto;
-        opt.textContent = depto;
-        selectDepto.appendChild(opt);
-    });
+    if (selectDepto) {
+        Object.keys(baseDatosSalta).sort().forEach(depto => {
+            const opt = document.createElement('option');
+            opt.value = depto;
+            opt.textContent = depto;
+            selectDepto.appendChild(opt);
+        });
+    }
 };
 
 function centrar(id){
     const elemento = document.getElementById(id);
-    setTimeout(() => {
-        elemento.scrollIntoView({ behavior:"smooth", block:"center" });
-    },300);
+    if (elemento) {
+        setTimeout(() => {
+            elemento.scrollIntoView({ behavior:"smooth", block:"center" });
+        }, 300);
+    }
 }
 
 function evaluarLocalidad() {
@@ -391,7 +406,8 @@ function sugerirPorMunicipio() {
     let prestadoresSugeridos = [...baseDatosSalta[depto].prestadorDefecto];
 
     if (depto === "Rivadavia" && muni === "RIVADAVIA BANDA SUR") {
-        prestadoresSugeridos = ["CIRCULO MEDICO DE ANTA"];}
+        prestadoresSugeridos = ["CIRCULO MEDICO DE ANTA"];
+    }
     mostrarPrestadores(prestadoresSugeridos, true);
 }
 
@@ -409,25 +425,28 @@ function mostrarPrestadores(lista, esSugerido) {
         radio.type = 'radio';
         radio.name = 'prestador_opt';
         radio.value = prestador;
-        radio.onchange = function() {prestadorSeleccionado = this.value;};
+        radio.onchange = function() { prestadorSeleccionado = this.value; };
         let nombreVisual = prestador;
-        if (prestador === "SAMOBA SALUD SA") {nombreVisual = "INSTITUTO MEDICO SAVIA SALUD";}        
+        if (prestador === "SAMOBA SALUD SA") { nombreVisual = "INSTITUTO MEDICO SAVIA SALUD"; }        
         label.appendChild(radio);
         label.appendChild(document.createTextNode(nombreVisual));
         contenedor.appendChild(label);
     });
-    if (esSugerido) {tag.classList.remove('oculto');
-    } else {tag.classList.add('oculto');}
+    if (esSugerido) {
+        tag.classList.remove('oculto');
+    } else {
+        tag.classList.add('oculto');
+    }
     cajaResultado.classList.remove('oculto');
     cajaResultado.classList.add('fade-in');
     centrar("resultadoUbicacion");
 }
 
-const URL_TARJETA_ESPECIAL = "https://raw.githubusercontent.com/Facundo598/Pruebas/refs/heads/main/img/Especial.png";
-const URL_TARJETA_BASICO = "https://raw.githubusercontent.com/Facundo598/Pruebas/refs/heads/main/img/Basico.png";
+const URL_TARJETA_ESPECIAL = "https://raw.githubusercontent.com/OSFATLYF/Consultas/refs/heads/main/img/Especial.png";
+const URL_TARJETA_BASICO = "https://raw.githubusercontent.com/OSFATLYF/Consultas/refs/heads/main/img/Basico.png";
 
 function detectarEnter(event) {
-    if (event.key === "Enter") {
+    if (event.key === "Enter") { 
         event.preventDefault(); 
         buscarUsuario();
     }
@@ -440,14 +459,19 @@ async function buscarUsuario() {
     const tarjeta = document.getElementById("tarjetaAfiliado");
     const botonBuscar = document.querySelector("#busquedaDiv button");
 
+    if (!dni) {
+        msgBusqueda.style.display = "block";
+        msgBusqueda.innerHTML = "Ingrese un DNI válido";
+        msgBusqueda.style.color = "red";
+        return;
+    }
+
     msgBusqueda.style.display = "block"; 
     msgBusqueda.innerHTML = "Buscando, por favor aguarde...";
     msgBusqueda.className = "error-dni"; 
     msgBusqueda.style.color = "#1976d2";
-    
     botonBuscar.disabled = true; 
     botonBuscar.innerText = "Buscando...";
-
     tarjeta.classList.add("oculto");
 
     document.getElementById("localidad").selectedIndex = 0;
@@ -472,10 +496,9 @@ async function buscarUsuario() {
         const respuesta = await fetch(URL_AFILIADOS, { method: "POST", body: formData });
         const datos = await respuesta.json();
       
-
         if (datos.existe) {
             afiliado = datos;
-          	ordenesDisponibles = await obtenerOrdenesDisponibles(datos.dni, datos.plan);
+            ordenesDisponibles = await obtenerOrdenesDisponibles(datos.dni, datos.plan);
             msgBusqueda.innerHTML = ""; 
             msgBusqueda.style.display = "none";
 
@@ -509,8 +532,9 @@ async function buscarUsuario() {
                 ordenesDisponibles.forEach(orden => {
                     const op = document.createElement("option");
                     op.value = orden.id;
-                    if (tieneCondicion) { op.textContent = orden.nombre; } 
-                    else { 
+                    if (tieneCondicion) { 
+                        op.textContent = orden.nombre; 
+                    } else { 
                         const precioFormateado = `$${orden.precio.toLocaleString('es-AR')}`;
                         op.textContent = `${orden.nombre} (${precioFormateado})`; 
                     }
@@ -519,19 +543,18 @@ async function buscarUsuario() {
 
                 document.getElementById("ordenesDiv").classList.remove("oculto");
                 
-                if (tieneCondicion) {
+                if (tieneCondicion) { 
                     document.getElementById("pagoDiv").classList.add("oculto");
                 } else {
                     document.getElementById("pagoDiv").classList.remove("oculto");
                     const labelPlanilla = document.getElementById("opcionPlanillaLabel");
                     if (afiliado && afiliado.trabajador && afiliado.trabajador.toUpperCase() === "ACTIVO") {
                         labelPlanilla.classList.remove("oculto-planilla");
-                    } else {
-                        labelPlanilla.classList.add("oculto-planilla");
+                    } else { 
+                        labelPlanilla.classList.add("oculto-planilla"); 
                     }
                 }
                 
-                // Mostramos el selector de método de recepción una vez validado el usuario
                 document.getElementById("recepcionDiv").classList.remove("oculto");
                 document.getElementById("enviarDiv").classList.remove("oculto");
             }
@@ -558,9 +581,11 @@ async function obtenerOrdenesDisponibles(dni, plan) {
     try {
         const respuesta = await fetch(URL_GESTION + "?action=obtenerOrdenes&dni=" + encodeURIComponent(dni) + "&plan=" + encodeURIComponent(plan));
         const resultado = await respuesta.json();
-        
         return resultado.ordenesDisponibles || [];
-    } catch (error) { console.error("Error al consultar las órdenes en la gestión:", error); return []; }
+    } catch (error) { 
+        console.error("Error al consultar las órdenes en la gestión:", error); 
+        return []; 
+    }
 } 
   
 function cambioMetodoPago() {
@@ -573,10 +598,11 @@ function cambioMetodoPago() {
     } else {
         comprobanteDiv.classList.add("oculto");
         document.getElementById("comprobanteInput").value = ""; 
+        textoComprobanteCapturado = "";
+        archivoProcesadoValido = null;
     }
 }
 
-// NUEVA FUNCIÓN PARA GESTIONAR LA RECEPCIÓN DINÁMICAMENTE
 function evaluarMetodoRecepcion() {
     const metodo = document.getElementById("metodoRecepcion").value;
     const contenedorCorreo = document.getElementById("contenedor-correo");
@@ -585,12 +611,100 @@ function evaluarMetodoRecepcion() {
     contenedorCorreo.classList.add("oculto");
     contenedorWhatsapp.classList.add("oculto");
 
-    if (metodo === "Correo") {
-        contenedorCorreo.classList.remove("oculto");
+    if (metodo === "Correo") { 
+        contenedorCorreo.classList.remove("oculto"); 
         centrar("contenedor-correo");
-    } else if (metodo === "WhatsApp") {
-        contenedorWhatsapp.classList.remove("oculto");
+    } else if (metodo === "WhatsApp") { 
+        contenedorWhatsapp.classList.remove("oculto"); 
         centrar("contenedor-whatsapp");
+    }
+}
+
+async function procesarArchivo() {
+    const input = document.getElementById("comprobanteInput");
+    const mensaje = document.getElementById("mensajeComprobante") || document.getElementById("mensaje");
+    const contenedor = document.getElementById("contenedorTexto");
+    const textarea = document.getElementById("textoLeido");
+
+    if (mensaje) mensaje.innerHTML = "";
+    if (contenedor) contenedor.style.display = "none";
+    if (textarea) textarea.value = "";
+
+    textoComprobanteCapturado = "";
+    archivoProcesadoValido = null;
+
+    if (!input.files || input.files.length === 0) return;
+    let file = input.files[0];
+    const nombre = file.name.toLowerCase();
+    const permitidos = ['.jpg', '.jpeg', '.png', '.pdf', '.webp', '.heic'];
+    if (!permitidos.some(ext => nombre.endsWith(ext))) { 
+        alert("Formato no admitido."); 
+        input.value = ""; 
+        return; 
+    }
+    const max = 2 * 1024 * 1024;
+    let min = (nombre.endsWith('.pdf') || file.type === 'application/pdf') ? 10 * 1024 : 20 * 1024;
+
+    if (file.size < min || file.size > max) { 
+        alert("El archivo no cumple con el tamaño permitido (20KB - 2MB).");
+        input.value = ""; 
+        return; 
+    }
+
+    if (nombre.endsWith('.heic') || file.type === 'image/heic') {
+        try { 
+            const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.8 });
+            file = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" });
+        } catch (e) { 
+            alert("Error al procesar HEIC."); 
+            input.value = ""; 
+            return; 
+        }
+    }
+
+    if (mensaje) { 
+        mensaje.innerHTML = "Verificando comprobante..."; 
+        mensaje.style.color = "orange"; 
+    }
+
+    try {
+        const worker = await Tesseract.createWorker('eng');
+        const ret = await worker.recognize(file);
+        await worker.terminate();
+        const textoLeido = ret.data.text.toLowerCase();
+        textoComprobanteCapturado = ret.data.text;
+
+        if (textarea) textarea.value = textoComprobanteCapturado;
+        if (contenedor) contenedor.style.display = "block";
+
+        const palabrasClave = [
+            "transferencia", "transfiriendo", "cbu", "cvu", "alias", "importe", "monto", "cuit", "cuil", "banco", "comprobante", 
+            "operacion", "nro", "numero", "fecha", "destino", "origen", "mp", "mercadopago", "ueno", "brubank", "galicia", "macro", "bbva", "santander"
+        ];
+
+        let tieneCoincidencias = palabrasClave.some(palabra => textoLeido.includes(palabra));
+
+        if (tieneCoincidencias && textoLeido.trim().length > 15) {
+            archivoProcesadoValido = file;
+            if (mensaje) { 
+                mensaje.innerHTML = "✓ Comprobante legible.";
+                mensaje.style.color = "green"; 
+            }
+        } else {
+            if (mensaje) { 
+                mensaje.innerHTML = "Comprobante no válido o ilegible.";
+                mensaje.style.color = "red";
+            }
+            input.value = "";
+            if (contenedor) contenedor.style.display = "none";
+        }
+    } catch (e) {
+        if (mensaje) {
+            mensaje.innerHTML = "Comprobante inválido o error al procesar.";
+            mensaje.style.color = "red";
+        }
+        input.value = "";
+        if (contenedor) contenedor.style.display = "none";
     }
 }
 
@@ -615,9 +729,7 @@ async function enviarSolicitud() {
     
     const localidadSeleccionada = document.getElementById("localidad").value;
     const metodoPago = document.querySelector('input[name="metodoPago"]:checked')?.value;
-    const comprobanteInput = document.getElementById("comprobanteInput");
 
-    // RECOPILAR DATOS DE RECEPCIÓN
     const metodoRecepcion = document.getElementById("metodoRecepcion").value;
     let datoContacto = "Pasa a retirar";
 
@@ -632,7 +744,6 @@ async function enviarSolicitud() {
         return;
     }
     
-    // VALIDACIÓN ESPECÍFICA PARA LOS NUEVOS CAMPOS
     if (!metodoRecepcion) {
         resultado.innerHTML = "Por favor, seleccione un método de recepción para su orden.";
         resultado.className = "error";
@@ -663,8 +774,8 @@ async function enviarSolicitud() {
     const tieneCondicion = afiliado && afiliado.condicion && afiliado.condicion.trim() !== "";
     let metodoPagoFinal = metodoPago;
     
-    if (tieneCondicion) {
-        metodoPagoFinal = "Sin cargo (" + afiliado.condicion.trim() + ")";
+    if (tieneCondicion) { 
+        metodoPagoFinal = "Sin cargo (CUD)";
     } else if (!metodoPago) {
         resultado.innerHTML = "Por favor, seleccione un método de pago.";
         resultado.className = "error";
@@ -675,15 +786,14 @@ async function enviarSolicitud() {
     let nombreArchivo = "";
 
     if (metodoPago === "Transferencia bancaria") {
-        if (comprobanteInput.files.length === 0) {
-            resultado.innerHTML = "Debe adjuntar el comprobante de transferencia.";
+        if (!archivoProcesadoValido) {
+            resultado.innerHTML = "Debe adjuntar comprobante de transferencia.";
             resultado.className = "error";
             return;
         }
         try {
-            const file = comprobanteInput.files[0];
-            nombreArchivo = file.name;
-            archivoBase64 = await archivoABase64(file);
+            nombreArchivo = archivoProcesadoValido.name;
+            archivoBase64 = await archivoABase64(archivoProcesadoValido);
         } catch (e) {
             resultado.innerHTML = "Error al leer el archivo. Intente con otra imagen.";
             resultado.className = "error";
@@ -702,7 +812,7 @@ async function enviarSolicitud() {
     formData.append("nombre", nombre);
     formData.append("orden", orden);
     formData.append("ordenNombre", ordenNombre);
-  	formData.append("plan", afiliado ? afiliado.plan : "");
+    formData.append("plan", afiliado ? afiliado.plan : "");
     formData.append("localidadSeleccionada", localidadSeleccionada);
     formData.append("prestadorSeleccionado", prestadorSeleccionado);
     formData.append("metodoPago", metodoPagoFinal);
@@ -712,10 +822,11 @@ async function enviarSolicitud() {
     if (archivoBase64) {
         formData.append("archivoBase64", archivoBase64);
         formData.append("nombreArchivo", nombreArchivo);
+        formData.append("textoComprobante", textoComprobanteCapturado); 
     }
 
     try {
-      	const response = await fetch(URL_GESTION, {method: "POST", body: formData});
+        const response = await fetch(URL_GESTION, { method: "POST", body: formData });
         const respuestaBackend = await response.json();
 
         if (respuestaBackend.ok) {
@@ -742,6 +853,8 @@ function limpiarFormulario() {
     afiliado = null;
     ordenesDisponibles = [];
     prestadorSeleccionado = null;
+    textoComprobanteCapturado = "";
+    archivoProcesadoValido = null;
 
     document.getElementById("dni").value = "";
     document.getElementById("localidad").selectedIndex = 0;
@@ -749,7 +862,9 @@ function limpiarFormulario() {
     document.getElementById("municipio").innerHTML = '<option value="" disabled selected>Seleccione municipio...</option>';
     document.getElementById("comprobanteInput").value = "";
     
-    // LIMPIAR LOS NUEVOS INPUTS Y SELECTORES
+    const mensajeComp = document.getElementById("mensajeComprobante") || document.getElementById("mensaje");
+    if (mensajeComp) mensajeComp.innerHTML = "";
+
     document.getElementById("metodoRecepcion").value = "";
     document.getElementById("correoContacto").value = "";
     document.getElementById("telefonoContacto").value = "";
@@ -769,7 +884,6 @@ function limpiarFormulario() {
     document.getElementById("pagoDiv").classList.add("oculto");
     document.getElementById("comprobanteDiv").classList.add("oculto");
     
-    // OCULTAR LAS SECCIONES DE CONTACTO
     document.getElementById("recepcionDiv").classList.add("oculto");
     document.getElementById("contenedor-correo").classList.add("oculto");
     document.getElementById("contenedor-whatsapp").classList.add("oculto");
@@ -784,7 +898,7 @@ function limpiarFormulario() {
 function salirYReiniciar() {
     document.getElementById("mensaje-exito").classList.add("oculto");
     document.getElementById("busquedaDiv").classList.remove("oculto");
-} 
+}  
 </script>
 </body>
 </html>
