@@ -260,9 +260,11 @@
         const { fila } = datosPendientes;
         const usuarioVal = document.getElementById('user').value;
         const passwordVal = document.getElementById('pass').value;
+  		const gestorVal = document.getElementById('ext-usuario').value;
         btnAceptar.disabled = true;
         btnAceptar.innerText = "Enviando...";
-        const params = new URLSearchParams({ action: "concluir", filaIndex: fila, usuario: usuarioVal, password: passwordVal });
+  		const params = new URLSearchParams({ action: "concluir", filaIndex: fila, usuario: usuarioVal, 
+        password: passwordVal, gestor: gestorVal });
         try {
             const res = await fetch(URL_API, { method: "POST", body: params });
             const result = await res.json();
