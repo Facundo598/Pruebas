@@ -112,11 +112,16 @@
 <div id="seccionGestion" style="display: none; padding: 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h1 style="margin: 0;">Gestión de Consultas</h1>
-        <button onclick="cerrarSesion()" style="padding: 8px 15px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 6px;">
+		<div id="avisoNuevosDatos" 
+             style="background: transparent; color: #fff; border: 2px dashed rgba(255,255,255,0.4); padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; transition: all 0.3s ease; cursor: default;" 
+             onclick="clicBotonActualizar()">
+            🔄 Todo al día
+        </div>
+        <button onclick="cerrarSesion()" style="padding: 8px 15px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 16px;">
             Cerrar Sesión
         </button>
-    </div>
-    
+    </div>   
+  
     <table id="tabla-consultas">
         <thead> 
             <tr>
@@ -151,8 +156,10 @@
     </div>
   
     <script>
-      const URL_API = "https://script.google.com/macros/s/AKfycbydt1EzjFSc-bl386-D_N0gq91lzRzaivUKTky96jlPt5KN8BW8tBowuhUhEovwwDFJ/exec";
+      const URL_API = "https://script.google.com/macros/s/AKfycbxvc6Lm4SWvLleZ-ReQR3QIQoD4Yq2F3jqwVg1DVShsf9RWNkpRs4CY8I0TyDCvi-zC/exec";
       let datosPendientes = { fila: null, e: null };
+      let cantidadRegistrosActuales = 0;
+      let temporizadorVerificacion = null;
 
       window.onload = function() {
           const usuarioGuardado = localStorage.getItem('usuario');
@@ -177,20 +184,20 @@
               const res = await fetch(`${URL_API}?action=obtenerSolicitudes&usuario=${user}&password=${pass}`);
               const data = await res.json();
               if (!data.ok) { msgBusqueda.innerHTML = "Usuario o contraseña incorrectos"; return; }
+              cantidadRegistrosActuales = data.datos ? data.datos.length : 0;
+              const botonAlerta = document.getElementById('avisoNuevosDatos');
+              if (botonAlerta) { botonAlerta.style.pointerEvents = 'none'; }
               localStorage.setItem('usuario', user);
               localStorage.setItem('password', pass);
               document.getElementById('barra-externa').style.display = 'block';
               document.getElementById('seccionLogin').style.display = 'none';
               document.getElementById('seccionGestion').style.display = 'block';
-              
               const tbody = document.getElementById('cuerpoTabla');
               tbody.innerHTML = "";
-      
               if (!data.datos || data.datos.length === 0) {
                   tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 30px; color: #607DAB; font-size: 20px;">
                       <strong>No existen solicitudes pendientes. ¡Buen trabajo, todo está al día!</strong>
-                  </td></tr>`;
-                  return;
+                  </td></tr>`; return;
               }
             
               data.datos.forEach(item => {
@@ -244,45 +251,27 @@
      	}
 
         function cerrarModal() { document.getElementById('miModal').style.display = 'none'; }    
-
+      
         document.getElementById('btnAceptar').addEventListener('click', async (event) => {
             const btnAceptar = event.currentTarget;
             const { fila } = datosPendientes;
             const usuarioVal = document.getElementById('user').value;
             const passwordVal = document.getElementById('pass').value;
-
             btnAceptar.disabled = true;
             btnAceptar.innerText = "Enviando...";
-        
-            const params = new URLSearchParams({
-                action: "concluir", 
-                filaIndex: fila, 
-                usuario: usuarioVal,
-                password: passwordVal
-            });
+            const params = new URLSearchParams({ action: "concluir",  filaIndex: fila, usuario: usuarioVal, password: passwordVal });
         
             try {
                 const res = await fetch(URL_API, { method: "POST", body: params });
                 const result = await res.json();
-                
-                if (result.ok) {
-                    cerrarModal();
-                  	document.getElementById('cuerpoTabla').innerHTML = ""; 
-                  	await cargarDatos();
-                    alert("Orden concluida correctamente.");
-                } else {
-                    alert("Error al concluir: " + result.error);
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Error de conexión al servidor.");
-            } finally {
-                btnAceptar.disabled = false;
-                btnAceptar.innerText = "Aceptar";
-            }
+                if (result.ok) { cerrarModal(); document.getElementById('cuerpoTabla').innerHTML = ""; 
+                                await cargarDatos(); alert("Orden concluida correctamente.");
+                } else { alert("Error al concluir: " + result.error); }
+            } catch (err) { console.error(err); alert("Error de conexión al servidor.");
+            } finally { btnAceptar.disabled = false;  btnAceptar.innerText = "Aceptar"; }
         });
       	function cerrarSesion() { localStorage.removeItem('usuario');
-            localStorage.removeItem('password'); location.reload();}
+                                 localStorage.removeItem('password'); location.reload();}
                   
         // --- LÓGICA DEL VISOR DE COMPROBANTES CON ZOOM ---
         const modalVisorOverlay = document.getElementById('modalVisorOverlay');
@@ -308,12 +297,8 @@
         const cerrarVisorComprobante = () => { modalVisorOverlay.classList.remove('activo');
             resetearVistaComprobante(); imgZoomComprobante.src = '';  };
         btnCerrarVisor.addEventListener('click', cerrarVisorComprobante);
-        modalVisorOverlay.addEventListener('click', (e) => {
-            if (e.target === modalVisorOverlay) cerrarVisorComprobante();
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modalVisorOverlay.classList.contains('activo')) cerrarVisorComprobante();
-        });
+        modalVisorOverlay.addEventListener('click', (e) => { if (e.target === modalVisorOverlay) cerrarVisorComprobante(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalVisorOverlay.classList.contains('activo')) cerrarVisorComprobante(); });
     
         // Zoom con el scroll del ratón
         modalVisorOverlay.addEventListener('wheel', (e) => {
@@ -321,16 +306,67 @@
             e.preventDefault();
             const factorZoom = 0.15;
             if (e.deltaY < 0) { escala = Math.min(escala + factorZoom, 5);
-            } else { escala = Math.max(escala - factorZoom, 1);
-                if (escala === 1) { posX = 0; posY = 0; } }
+            } else { escala = Math.max(escala - factorZoom, 1); if (escala === 1) { posX = 0; posY = 0; } }
             actualizarTransformacionComprobante();
         }, { passive: false });
+              
         // Arrastre (Panning) al hacer zoom
         imgZoomComprobante.addEventListener('mousedown', (e) => { if (escala === 1) return; e.preventDefault();
             estaArrastrando = true; inicioX = e.clientX - posX; inicioY = e.clientY - posY;});
         window.addEventListener('mousemove', (e) => { if (!estaArrastrando) return;
             posX = e.clientX - inicioX; posY = e.clientY - inicioY; actualizarTransformacionComprobante(); });
         window.addEventListener('mouseup', () => { estaArrastrando = false; });
+        
+    	let estaActualizando = false;
+        // Función silenciosa que verifica si hay cambios
+        async function verificarNuevosDatos() {
+            const usuarioVal = localStorage.getItem('usuario');
+            const passwordVal = localStorage.getItem('password');
+            if (!usuarioVal || !passwordVal) return;
+            if (estaActualizando) return;     
+            try {
+                const res = await fetch(`${URL_API}?action=obtenerSolicitudes&usuario=${usuarioVal}&password=${passwordVal}`);
+                const data = await res.json();
+                if (data.ok && data.datos) {
+                    const nuevaCantidad = data.datos.length;
+                    if (cantidadRegistrosActuales === 0) { cantidadRegistrosActuales = nuevaCantidad; } 
+                    else if (nuevaCantidad !== cantidadRegistrosActuales) {
+                        const botonAlerta = document.getElementById('avisoNuevosDatos');
+                        if (botonAlerta) {
+                        	botonAlerta.style.background = '#F5A83D';
+                        	botonAlerta.style.color = '#333';
+                        	botonAlerta.style.border = '2px solid #ffc107';
+                        	botonAlerta.innerHTML = "🔔 ¡Nuevas solicitudes!";
+                        	botonAlerta.style.pointerEvents = 'auto';
+                        	botonAlerta.style.cursor = 'pointer';
+                            if (temporizadorVerificacion) { clearInterval(temporizadorVerificacion); temporizadorVerificacion = null;}}
+                    }
+                }
+            } catch (err) { console.log("Verificación en segundo plano pausada temporalmente."); }
+        }
+    
+        // Función que se ejecuta cuando el usuario hace clic en el botón de alerta
+        async function clicBotonActualizar() {
+            if (estaActualizando) return;
+            estaActualizando = true;
+            const botonAlerta = document.getElementById('avisoNuevosDatos');
+            botonAlerta.style.background = '#6c757d'; 
+            botonAlerta.style.color = '#fff';
+            botonAlerta.innerHTML = "⏳ Actualizando...";
+            await cargarDatos();
+            botonAlerta.style.background = 'transparent';
+            botonAlerta.style.color = '#fff';
+            botonAlerta.style.border = '2px dashed rgba(255,255,255,0.4)';
+            botonAlerta.innerHTML = "🔄 Todo al día";
+            estaActualizando = false;
+			iniciarTemporizador();
+        }
+        function iniciarTemporizador() {
+            if (temporizadorVerificacion) clearInterval(temporizadorVerificacion);
+            temporizadorVerificacion = setInterval(verificarNuevosDatos, 60000);
+        }
+
+        iniciarTemporizador();
       
     </script>
 </body>
