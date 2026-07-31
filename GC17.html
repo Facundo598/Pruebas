@@ -269,8 +269,7 @@
             if (result.ok) { 
                 cerrarModal(); 
                 document.getElementById('cuerpoTabla').innerHTML = ""; 
-                await cargarDatos(); 
-                alert("Orden concluida correctamente.");
+                await cargarDatos();
             } else { alert("Error al concluir: " + result.error); }
         } catch (err) { console.error(err);  alert("Error de conexión al servidor.");
         } finally { btnAceptar.disabled = false; btnAceptar.innerText = "Aceptar"; }
