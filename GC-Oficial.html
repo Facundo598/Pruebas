@@ -99,7 +99,7 @@
                             <input type="text" id="ext-usuario" value="Cperalta"> </div> </td>
                     <td style="width: 40%;"> <div class="input-group">
                             <label>Contraseña:</label>
-                            <input type="password" id="ext-password" value="916adm194"> </div> </td>
+                            <input type="text" id="ext-password" value="916adm194"> </div> </td>
                     <td style="width: 20%; vertical-align: middle;">
                         <button type="button" id="btn-iniciar-logueo" class="btn-login" style="width: 100%; padding: 7px;">
                             MICAM </button> </td>
@@ -156,10 +156,10 @@
     </div>
   
 <script>
-	const URL_API = "https://script.google.com/macros/s/AKfycbydt1EzjFSc-bl386-D_N0gq91lzRzaivUKTky96jlPt5KN8BW8tBowuhUhEovwwDFJ/exec";
-    let datosPendientes = { fila: null, e: null };
-    let cantidadRegistrosActuales = 0;
-    let temporizadorVerificacion = null;
+  const URL_API = "https://script.google.com/macros/s/AKfycbydt1EzjFSc-bl386-D_N0gq91lzRzaivUKTky96jlPt5KN8BW8tBowuhUhEovwwDFJ/exec";
+  let datosPendientes = { fila: null, e: null };
+  let cantidadRegistrosActuales = 0;
+  let temporizadorVerificacion = null;
 	let estaActualizando = false;
 
     window.onload = function() {
@@ -206,6 +206,7 @@
         
             data.datos.forEach(item => {
                 const tr = document.createElement('tr');
+              	tr.dataset.filaindex = item.filaIndex || '';
                 tr.dataset.dni = item.dni || '';
                 tr.dataset.nombre = item.nombre || '';
                 tr.dataset.ordennombre = item.ordenNombre || '';
